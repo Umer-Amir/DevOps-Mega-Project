@@ -24,9 +24,14 @@ pipeline {
         }
         
         stage('Terraform Plan') {
-            steps {
-                dir('terraform') {
-                    sh 'terraform plan -out=tfplan'
+            steps {                dir('terraform') {
+                    sh """
+                    terraform plan -out=tfplan \
+                    -var="azure_subscription_id=${AZURE_SUBSCRIPTION_ID}" \
+                    -var="azure_client_id=${AZURE_CLIENT_ID}" \
+                    -var="azure_client_secret=${AZURE_CLIENT_SECRET}" \
+                    -var="azure_tenant_id=${AZURE_TENANT_ID}"
+                    """
                 }
             }
         }
