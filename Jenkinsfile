@@ -14,10 +14,10 @@ pipeline {
                 checkout scm
             }
         }
-        
-        stage('Terraform Init') {
+          stage('Terraform Init') {
             steps {
                 dir('terraform') {
+                    tool 'Terraform'
                     sh 'terraform init'
                 }
             }
