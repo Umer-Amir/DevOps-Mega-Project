@@ -14,10 +14,10 @@ pipeline {
                 checkout scm
             }
         }
-          stage('Terraform Init') {
+        
+        stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    tool 'Terraform'
                     sh 'terraform init'
                 }
             }
@@ -54,7 +54,7 @@ pipeline {
                     ).trim()
                     
                     writeFile file: 'inventory.ini', text: """[webserver]
-${publicIP} ansible_user=adminuser ansible_ssh_private_key_file=${WORKSPACE}/ssh_key"""
+${publicIP} ansible_user=adminuser ansible_ssh_private_key_file=${WORKSPACE}/jenkins_ssh_key"""
                     
                     sh 'ansible-playbook -i inventory.ini ansible/install_web.yml'
                 }
