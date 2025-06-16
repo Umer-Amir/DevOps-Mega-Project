@@ -1,1 +1,1 @@
-public_key_path = "../ssh_key.pub"
+public_key_path = "../jenkins_ssh_key.pub"
