@@ -54,15 +54,15 @@ pipeline {
                 }
             }
         }
-        
-        stage('Wait for VM') {
+          stage('Wait for VM') {
             steps {
                 script {
-                    // Wait for VM and retry getting IP if empty
-                    def maxRetries = 10
+                    def maxRetries = 20
                     def publicIP = ""
+                    def sshReady = false
                     
-                    for (int i = 0; i < maxRetries; i++) {
+                    // Wait for IP assignment
+                    for (int i = 0; i < maxRetries && !publicIP; i++) {
                         sleep(time: 30, unit: 'SECONDS')
                         publicIP = sh(
                             script: "cd terraform && terraform output -raw public_ip_address",
@@ -71,14 +71,37 @@ pipeline {
                         
                         if (publicIP) {
                             echo "Public IP found: ${publicIP}"
-                            break
+                        } else {
+                            echo "Waiting for public IP assignment (attempt ${i + 1}/${maxRetries})"
                         }
-                        echo "Waiting for public IP assignment (attempt ${i + 1}/${maxRetries})"
                     }
                     
                     if (!publicIP) {
                         error "Failed to get public IP after ${maxRetries} attempts"
                     }
+
+                    // Wait for SSH to be ready
+                    echo "Waiting for SSH to be ready..."
+                    for (int i = 0; i < maxRetries && !sshReady; i++) {
+                        sleep(time: 30, unit: 'SECONDS')
+                        def sshTest = sh(
+                            script: "nc -zv -w 5 ${publicIP} 22 2>&1",
+                            returnStatus: true
+                        )
+                        if (sshTest == 0) {
+                            echo "SSH is ready!"
+                            sshReady = true
+                        } else {
+                            echo "Waiting for SSH to be ready (attempt ${i + 1}/${maxRetries})"
+                        }
+                    }
+                    
+                    if (!sshReady) {
+                        error "SSH did not become ready after ${maxRetries} attempts"
+                    }
+
+                    // Final wait to ensure system is fully booted
+                    sleep(time: 60, unit: 'SECONDS')
                 }
             }
         }
