@@ -11,15 +11,21 @@ pipeline {
 
     stages {        stage('Setup SSH Key') {
             steps {
-                script {
-                    // Write the SSH private key
+                script {                    // Write the SSH private key with correct permissions
                     withCredentials([file(credentialsId: 'jenkins_ssh_key', variable: 'SSH_KEY_FILE')]) {
-                        sh 'cp "$SSH_KEY_FILE" jenkins_ssh_key'
-                        sh 'chmod 600 jenkins_ssh_key'
+                        sh '''
+                            cp "$SSH_KEY_FILE" jenkins_ssh_key
+                            chmod 600 jenkins_ssh_key
+                            ls -l jenkins_ssh_key
+                        '''
                     }
                     // Write the SSH public key
                     withCredentials([file(credentialsId: 'jenkins_ssh_key_pub', variable: 'SSH_KEY_PUB_FILE')]) {
-                        sh 'cp "$SSH_KEY_PUB_FILE" jenkins_ssh_key.pub'
+                        sh '''
+                            cp "$SSH_KEY_PUB_FILE" jenkins_ssh_key.pub
+                            chmod 644 jenkins_ssh_key.pub
+                            ls -l jenkins_ssh_key.pub
+                        '''
                     }
                 }
             }
@@ -81,9 +87,13 @@ pipeline {
                     }                    // Wait for SSH to be ready
                     echo "Waiting for SSH to be ready..."
                     for (int i = 0; i < maxRetries && !sshReady; i++) {
-                        sleep(time: 30, unit: 'SECONDS')
+                        sleep(time: 30, unit: 'SECONDS')                        // Verify key permissions before SSH test
+                        sh 'chmod 600 jenkins_ssh_key'
                         def sshTest = sh(
-                            script: "ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@${publicIP} echo 'SSH connection test' 2>&1",
+                            script: '''
+                                ls -l jenkins_ssh_key
+                                ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@${publicIP} echo 'SSH connection test' 2>&1
+                            ''',
                             returnStatus: true
                         )
                         if (sshTest == 0) {
