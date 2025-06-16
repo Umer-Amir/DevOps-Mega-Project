@@ -11,7 +11,7 @@ pipeline {
 
     stages {
         stage('Setup SSH Key') {
-            steps {
+            steps {[]
                 script {
                     // Write the SSH private key
                     withCredentials([file(credentialsId: 'jenkins_ssh_key', variable: 'SSH_KEY_FILE')]) {
@@ -58,7 +58,29 @@ pipeline {
         
         stage('Wait for VM') {
             steps {
-                sleep(time: 60, unit: 'SECONDS')
+                script {
+                    // Wait for VM and retry getting IP if empty
+                    def maxRetries = 10
+                    def publicIP = ""
+                    
+                    for (int i = 0; i < maxRetries; i++) {
+                        sleep(time: 30, unit: 'SECONDS')
+                        publicIP = sh(
+                            script: "cd terraform && terraform output -raw public_ip_address",
+                            returnStdout: true
+                        ).trim()
+                        
+                        if (publicIP) {
+                            echo "Public IP found: ${publicIP}"
+                            break
+                        }
+                        echo "Waiting for public IP assignment (attempt ${i + 1}/${maxRetries})"
+                    }
+                    
+                    if (!publicIP) {
+                        error "Failed to get public IP after ${maxRetries} attempts"
+                    }
+                }
             }
         }
         
@@ -70,10 +92,18 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     
-                    writeFile file: 'inventory.ini', text: """[webserver]
-${publicIP} ansible_user=adminuser ansible_ssh_private_key_file=jenkins_ssh_key ansible_host_key_checking=False"""
+                    if (!publicIP) {
+                        error "Public IP is not available"
+                    }
                     
-                    sh 'ansible-playbook -i inventory.ini ansible/install_web.yml'
+                    // Create inventory file in project root
+                    writeFile file: 'inventory.ini', text: """[webserver]
+${publicIP} ansible_ssh_user=adminuser ansible_ssh_private_key_file=${WORKSPACE}/jenkins_ssh_key ansible_host_key_checking=False"""
+                    
+                    // Run ansible-playbook from project root
+                    sh 'ls -la' // Debug: list files
+                    sh 'cat inventory.ini' // Debug: show inventory content
+                    sh 'ansible-playbook -i inventory.ini -v ansible/install_web.yml'
                 }
             }
         }

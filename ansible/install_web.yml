@@ -1,6 +1,6 @@
 ---
 - name: Install and configure web server
-  hosts: all
+  hosts: webserver
   become: yes
   tasks:
     - name: Update apt cache
