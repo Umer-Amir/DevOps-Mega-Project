@@ -19,6 +19,24 @@
         state: started
         enabled: yes
 
+    - name: Remove default Apache page
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
+    - name: Copy custom website files
+      copy:
+        src: ../app/
+        dest: /var/www/html/
+        mode: '0644'
+        owner: www-data
+        group: www-data
+
+    - name: Remove default Apache web page
+      file:
+        path: /var/www/html/index.html
+        state: absent
+
     - name: Copy website files
       copy:
         src: ../app/
@@ -35,3 +53,8 @@
         owner: www-data
         group: www-data
         recurse: yes
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
