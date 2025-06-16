@@ -3,6 +3,7 @@ jenkins_ssh_key*
 ssh_key*
 
 # Terraform
+terraform/.terraform/*
 .terraform/
 *.tfstate
 *.tfstate.*

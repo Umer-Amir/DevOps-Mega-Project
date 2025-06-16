@@ -2,6 +2,8 @@
 
 This project implements a fully automated DevOps pipeline using Jenkins (in Docker) that provisions Azure infrastructure with Terraform, configures it with Ansible, and deploys a static web application. This README documents both the setup process and the challenges we encountered along the way.
 
+![Project Diagram](Project.png)
+
 ## 🚀 Technology Stack
 
 - **Docker** - Containerized Jenkins with all required tools
@@ -26,8 +28,10 @@ project/
 ├── logs/               # Execution logs for debugging
 │   ├── 22nd Build Success.txt
 │   └── 25th Build Success.txt
+├── Screenshots/
 ├── Dockerfile          # Custom Jenkins image with tools
 ├── Jenkinsfile        # Pipeline definition
+├── Project.png
 └── .gitignore        # Git ignore patterns
 ```
 
