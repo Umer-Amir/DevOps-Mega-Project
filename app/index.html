@@ -1,46 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DevOps Pipeline Demo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f2f5;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 850px;
+        padding: 2.5rem;
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 20px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+      }
+
+      .tech-stack {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 2.5rem 0;
+      }
+
+      .tech-item {
+        background: rgba(255, 255, 255, 0.18);
+        padding: 1rem;
+        border-radius: 12px;
+        transition: transform 0.3s ease;
+      }
+
+      .tech-item:hover {
+        transform: translateY(-6px);
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .tech-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .success-message {
+        background: rgba(76, 175, 80, 0.25);
+        border: 2px solid rgba(76, 175, 80, 0.5);
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+      }
+
+      .pipeline-info {
+        background: rgba(0, 150, 136, 0.3);
+        border: 2px solid rgba(0, 150, 136, 0.6);
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+      }
+
+      .footer {
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        opacity: 0.85;
+      }
+
+      .student-info {
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+        text-align: left;
+      }
+
+      .student-info h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+        color: #fff;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        font-size: 1rem;
+      }
+
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #ffd700;
+      }
+
+      .info-value {
+        color: #fff;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
         }
-        .container {
-            text-align: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        50% {
+          transform: scale(1.05);
         }
-        h1 {
-            color: #1a73e8;
+        100% {
+          transform: scale(1);
         }
-        p {
-            color: #5f6368;
-        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Welcome to DevOps Pipeline Demo</h1>
-        <p>This page was deployed using:</p>
-        <ul style="list-style: none; padding: 0;">
-            <li>✅ Jenkins Pipeline</li>
-            <li>✅ Terraform on Azure</li>
-            <li>✅ Ansible Configuration</li>
-            <li>✅ Docker</li>
+      <h1 class="pulse">🚀 DevOps Pipeline Success!</h1>
+      <p class="subtitle">Fully Automated Infrastructure Deployment</p>
+
+      <div class="student-info">
+        <h2>👨‍🎓 Student Information</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Name:</span>
+            <span class="info-value" style="display:block; width:100%; text-align:center;">Umer Amir</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Registration #:</span>
+            <span class="info-value" style="display:block; width:100%; text-align:center;">2112241</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Section:</span>
+            <span class="info-value" style="display:block; width:100%; text-align:center;">A</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Course:</span>
+            <span class="info-value" style="display:block; width:100%; text-align:center;">DevOps</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Instructor:</span>
+            <span class="info-value" style="display:block; width:100%; text-align:center;">Tariq Khan Ghouri</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-message">
+        <h2>✅ Deployment Complete</h2>
+        <p>
+          Your web application has been successfully deployed using a fully
+          automated DevOps pipeline!
+        </p>
+      </div>
+
+      <div class="pipeline-info">
+        <h2>🔄 Pipeline Stages Completed</h2>
+        <ul style="list-style: none; padding: 0">
+          <li>✅ Jenkins Pipeline Triggered</li>
+          <li>✅ Terraform Infrastructure Provisioned</li>
+          <li>✅ Azure VM Created and Configured</li>
+          <li>✅ Ansible Web Server Installation</li>
+          <li>✅ Application Deployment</li>
         </ul>
-        <p>Deployment successful!</p>
+      </div>
+
+      <div class="tech-stack">
+        <div class="tech-item">
+          <h3>🐳 Docker</h3>
+          <p>Jenkins containerization</p>
+        </div>
+        <div class="tech-item">
+          <h3>🏗️ Jenkins</h3>
+          <p>CI/CD Automation</p>
+        </div>
+        <div class="tech-item">
+          <h3>🏗️ Terraform</h3>
+          <p>Infrastructure as Code</p>
+        </div>
+        <div class="tech-item">
+          <h3>⚙️ Ansible</h3>
+          <p>Configuration Management</p>
+        </div>
+        <div class="tech-item">
+          <h3>☁️ Azure</h3>
+          <p>Cloud Platform</p>
+        </div>
+        <div class="tech-item">
+          <h3>📚 Git</h3>
+          <p>Version Control</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Deployed on: <span id="deploy-time"></span></p>
+        <p>Server: Ubuntu 22.04 LTS | Web Server: Apache2</p>
+      </div>
     </div>
-</body>
+
+    <script>
+      document.getElementById("deploy-time").textContent =
+        new Date().toLocaleString();
+    </script>
+  </body>
 </html>
