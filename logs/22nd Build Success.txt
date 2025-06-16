@@ -1,0 +1,332 @@
+Started by user azureuser
+Obtained Jenkinsfile from git https://github.com/Umer-Amir/DevOps-Mega-Project.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/devops-pipeline@2
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/devops-pipeline@2/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Umer-Amir/DevOps-Mega-Project.git # timeout=10
+Fetching upstream changes from https://github.com/Umer-Amir/DevOps-Mega-Project.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/Umer-Amir/DevOps-Mega-Project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision fa88caf983a17f6f1adec26ffac93839c52178ab (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f fa88caf983a17f6f1adec26ffac93839c52178ab # timeout=10
+Commit message: "Add back NSG association for fresh deployment"
+ > git rev-list --no-walk fa88caf983a17f6f1adec26ffac93839c52178ab # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $ARM_TENANT_ID or $ARM_SUBSCRIPTION_ID or $ARM_CLIENT_ID or $ARM_CLIENT_SECRET
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Setup SSH Key)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $SSH_KEY_FILE
+[Pipeline] {
+[Pipeline] sh
++ cp **** jenkins_ssh_key
+[Pipeline] sh
++ chmod 600 jenkins_ssh_key
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] withCredentials
+Masking supported pattern matches of $SSH_KEY_PUB_FILE
+[Pipeline] {
+[Pipeline] sh
++ cp **** jenkins_ssh_key.pub
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/devops-pipeline@2/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Umer-Amir/DevOps-Mega-Project.git # timeout=10
+Fetching upstream changes from https://github.com/Umer-Amir/DevOps-Mega-Project.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/Umer-Amir/DevOps-Mega-Project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision fa88caf983a17f6f1adec26ffac93839c52178ab (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f fa88caf983a17f6f1adec26ffac93839c52178ab # timeout=10
+Commit message: "Add back NSG association for fresh deployment"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Terraform Init)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/devops-pipeline@2/terraform
+[Pipeline] {
+[Pipeline] sh
++ terraform init -no-color
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/azurerm from the dependency lock file
+- Using previously-installed hashicorp/azurerm v3.117.1
+
+Terraform has been successfully initialized!
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Terraform Plan)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/devops-pipeline@2/terraform
+[Pipeline] {
+[Pipeline] sh
++ terraform plan -no-color -out=tfplan
+azurerm_resource_group.rg: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg]
+azurerm_public_ip.public_ip: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/publicIPAddresses/webserver-public-ip]
+azurerm_virtual_network.vnet: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/virtualNetworks/webserver-vnet]
+azurerm_network_security_group.nsg: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/networkSecurityGroups/webserver-nsg]
+azurerm_subnet.subnet: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/virtualNetworks/webserver-vnet/subnets/webserver-subnet]
+azurerm_network_interface.nic: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/networkInterfaces/webserver-nic]
+azurerm_network_interface_security_group_association.nsg_association: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/networkInterfaces/webserver-nic|/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/networkSecurityGroups/webserver-nsg]
+azurerm_linux_virtual_machine.vm: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Compute/virtualMachines/webserver-vm]
+
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the
+last "terraform apply" which may have affected this plan:
+
+  # azurerm_public_ip.public_ip has changed
+  ~ resource "azurerm_public_ip" "public_ip" {
+        id                      = "/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/publicIPAddresses/webserver-public-ip"
+      + ip_address              = "172.191.11.131"
+        name                    = "webserver-public-ip"
+        # (8 unchanged attributes hidden)
+    }
+
+
+Unless you have made equivalent changes to your configuration, or ignored the
+relevant attributes using ignore_changes, the following plan may include
+actions to undo or respond to these changes.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Changes to Outputs:
+  ~ public_ip_address   = "" -> "172.191.11.131"
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Terraform Apply)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/devops-pipeline@2/terraform
+[Pipeline] {
+[Pipeline] sh
++ terraform apply -no-color -auto-approve tfplan
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+public_ip_address = "172.191.11.131"
+resource_group_name = "jenkins-pipeline-rg"
+vm_name = "webserver-vm"
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Wait for VM)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sleep
+Sleeping for 30 sec
+[Pipeline] sh
++ cd terraform
++ terraform output -raw public_ip_address
+[Pipeline] echo
+Public IP found: 172.191.11.131
+[Pipeline] echo
+Waiting for SSH to be ready...
+[Pipeline] sleep
+Sleeping for 30 sec
+[Pipeline] sh
++ ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@172.191.11.131 echo SSH connection test
+Warning: Permanently added '172.191.11.131' (ED25519) to the list of known hosts.
+SSH connection test
+[Pipeline] echo
+SSH is ready!
+[Pipeline] sleep
+Sleeping for 1 min 0 sec
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run Ansible)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ cd terraform
++ terraform output -raw public_ip_address
+[Pipeline] writeFile
+[Pipeline] sh
++ ls -la
+total 68
+drwxr-xr-x 7 jenkins jenkins 4096 Jun 16 04:42 .
+drwxr-xr-x 6 jenkins jenkins 4096 Jun 16 04:28 ..
+drwxr-xr-x 8 jenkins jenkins 4096 Jun 16 04:39 .git
+-rw-r--r-- 1 jenkins jenkins   21 Jun 16 04:28 .gitignore
+-rw-r--r-- 1 jenkins jenkins 1058 Jun 16 04:28 Dockerfile
+-rw-r--r-- 1 jenkins jenkins 5723 Jun 16 04:28 Jenkinsfile
+-rw-r--r-- 1 jenkins jenkins 1615 Jun 16 04:28 README.md
+drwxr-xr-x 2 jenkins jenkins 4096 Jun 16 04:28 ansible
+drwxr-xr-x 2 jenkins jenkins 4096 Jun 16 04:28 app
+-rw-r--r-- 1 jenkins jenkins  176 Jun 16 04:42 inventory.ini
+-rw------- 1 jenkins jenkins 3369 Jun 16 04:39 jenkins_ssh_key
+-rw-r--r-- 1 jenkins jenkins  736 Jun 16 04:39 jenkins_ssh_key.pub
+-rw-r--r-- 1 jenkins jenkins 1811 Jun 16 04:28 ssh_key
+-rw-r--r-- 1 jenkins jenkins  392 Jun 16 04:28 ssh_key.pub
+drwxr-xr-x 3 jenkins jenkins 4096 Jun 16 04:39 terraform
+drwxr-xr-x 2 jenkins jenkins 4096 Jun 16 04:39 terraform@tmp
+[Pipeline] sh
++ cat inventory.ini
+[webserver]
+172.191.11.131 ansible_ssh_user=adminuser ansible_ssh_private_key_file=/var/jenkins_home/workspace/devops-pipeline@2/jenkins_ssh_key ansible_host_key_checking=False
+[Pipeline] sh
++ ansible-playbook -i inventory.ini -v ansible/install_web.yml
+No config file found; using defaults
+
+PLAY [Install and configure web server] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+[WARNING]: Platform linux on host 172.191.11.131 is using the discovered Python
+interpreter at /usr/bin/python3.8, but future installation of another Python
+interpreter could change the meaning of that path. See
+https://docs.ansible.com/ansible-
+core/2.18/reference_appendices/interpreter_discovery.html for more information.
+ok: [172.191.11.131]
+
+TASK [Update apt cache] ********************************************************
+changed: [172.191.11.131] => {"cache_update_time": 1750048951, "cache_updated": true, "changed": true}
+
+TASK [Install Apache] **********************************************************
+changed: [172.191.11.131] => {"cache_update_time": 1750048951, "cache_updated": false, "changed": true, "stderr": "", "stderr_lines": [], "stdout": "Reading package lists...\nBuilding dependency tree...\nReading state information...\nThe following additional packages will be installed:\n  apache2-bin apache2-data apache2-utils libapr1 libaprutil1\n  libaprutil1-dbd-sqlite3 libaprutil1-ldap libjansson4 liblua5.2-0 ssl-cert\nSuggested packages:\n  apache2-doc apache2-suexec-pristine | apache2-suexec-custom www-browser\n  openssl-blacklist\nThe following NEW packages will be installed:\n  apache2 apache2-bin apache2-data apache2-utils libapr1 libaprutil1\n  libaprutil1-dbd-sqlite3 libaprutil1-ldap libjansson4 liblua5.2-0 ssl-cert\n0 upgraded, 11 newly installed, 0 to remove and 26 not upgraded.\nNeed to get 1874 kB of archives.\nAfter this operation, 8121 kB of additional disk space will be used.\nGet:1 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libapr1 amd64 1.6.5-1ubuntu1.1 [91.5 kB]\nGet:2 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libaprutil1 amd64 1.6.1-4ubuntu2.2 [85.1 kB]\nGet:3 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libaprutil1-dbd-sqlite3 amd64 1.6.1-4ubuntu2.2 [10.5 kB]\nGet:4 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libaprutil1-ldap amd64 1.6.1-4ubuntu2.2 [8752 B]\nGet:5 http://azure.archive.ubuntu.com/ubuntu focal/main amd64 libjansson4 amd64 2.12-1build1 [28.9 kB]\nGet:6 http://azure.archive.ubuntu.com/ubuntu focal/main amd64 liblua5.2-0 amd64 5.2.4-1.1build3 [106 kB]\nGet:7 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2-bin amd64 2.4.41-4ubuntu3.23 [1188 kB]\nGet:8 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2-data all 2.4.41-4ubuntu3.23 [159 kB]\nGet:9 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2-utils amd64 2.4.41-4ubuntu3.23 [84.4 kB]\nGet:10 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2 amd64 2.4.41-4ubuntu3.23 [95.6 kB]\nGet:11 http://azure.archive.ubuntu.com/ubuntu focal/main amd64 ssl-cert all 1.0.39 [17.0 kB]\nPreconfiguring packages ...\nFetched 1874 kB in 0s (9557 kB/s)\nSelecting previously unselected package libapr1:amd64.\r\n(Reading database ... \r(Reading database ... 5%\r(Reading database ... 10%\r(Reading database ... 15%\r(Reading database ... 20%\r(Reading database ... 25%\r(Reading database ... 30%\r(Reading database ... 35%\r(Reading database ... 40%\r(Reading database ... 45%\r(Reading database ... 50%\r(Reading database ... 55%\r(Reading database ... 60%\r(Reading database ... 65%\r(Reading database ... 70%\r(Reading database ... 75%\r(Reading database ... 80%\r(Reading database ... 85%\r(Reading database ... 90%\r(Reading database ... 95%\r(Reading database ... 100%\r(Reading database ... 59172 files and directories currently installed.)\r\nPreparing to unpack .../00-libapr1_1.6.5-1ubuntu1.1_amd64.deb ...\r\nUnpacking libapr1:amd64 (1.6.5-1ubuntu1.1) ...\r\nSelecting previously unselected package libaprutil1:amd64.\r\nPreparing to unpack .../01-libaprutil1_1.6.1-4ubuntu2.2_amd64.deb ...\r\nUnpacking libaprutil1:amd64 (1.6.1-4ubuntu2.2) ...\r\nSelecting previously unselected package libaprutil1-dbd-sqlite3:amd64.\r\nPreparing to unpack .../02-libaprutil1-dbd-sqlite3_1.6.1-4ubuntu2.2_amd64.deb ...\r\nUnpacking libaprutil1-dbd-sqlite3:amd64 (1.6.1-4ubuntu2.2) ...\r\nSelecting previously unselected package libaprutil1-ldap:amd64.\r\nPreparing to unpack .../03-libaprutil1-ldap_1.6.1-4ubuntu2.2_amd64.deb ...\r\nUnpacking libaprutil1-ldap:amd64 (1.6.1-4ubuntu2.2) ...\r\nSelecting previously unselected package libjansson4:amd64.\r\nPreparing to unpack .../04-libjansson4_2.12-1build1_amd64.deb ...\r\nUnpacking libjansson4:amd64 (2.12-1build1) ...\r\nSelecting previously unselected package liblua5.2-0:amd64.\r\nPreparing to unpack .../05-liblua5.2-0_5.2.4-1.1build3_amd64.deb ...\r\nUnpacking liblua5.2-0:amd64 (5.2.4-1.1build3) ...\r\nSelecting previously unselected package apache2-bin.\r\nPreparing to unpack .../06-apache2-bin_2.4.41-4ubuntu3.23_amd64.deb ...\r\nUnpacking apache2-bin (2.4.41-4ubuntu3.23) ...\r\nSelecting previously unselected package apache2-data.\r\nPreparing to unpack .../07-apache2-data_2.4.41-4ubuntu3.23_all.deb ...\r\nUnpacking apache2-data (2.4.41-4ubuntu3.23) ...\r\nSelecting previously unselected package apache2-utils.\r\nPreparing to unpack .../08-apache2-utils_2.4.41-4ubuntu3.23_amd64.deb ...\r\nUnpacking apache2-utils (2.4.41-4ubuntu3.23) ...\r\nSelecting previously unselected package apache2.\r\nPreparing to unpack .../09-apache2_2.4.41-4ubuntu3.23_amd64.deb ...\r\nUnpacking apache2 (2.4.41-4ubuntu3.23) ...\r\nSelecting previously unselected package ssl-cert.\r\nPreparing to unpack .../10-ssl-cert_1.0.39_all.deb ...\r\nUnpacking ssl-cert (1.0.39) ...\r\nSetting up libapr1:amd64 (1.6.5-1ubuntu1.1) ...\r\nSetting up libjansson4:amd64 (2.12-1build1) ...\r\nSetting up ssl-cert (1.0.39) ...\r\nSetting up liblua5.2-0:amd64 (5.2.4-1.1build3) ...\r\nSetting up apache2-data (2.4.41-4ubuntu3.23) ...\r\nSetting up libaprutil1:amd64 (1.6.1-4ubuntu2.2) ...\r\nSetting up libaprutil1-ldap:amd64 (1.6.1-4ubuntu2.2) ...\r\nSetting up libaprutil1-dbd-sqlite3:amd64 (1.6.1-4ubuntu2.2) ...\r\nSetting up apache2-utils (2.4.41-4ubuntu3.23) ...\r\nSetting up apache2-bin (2.4.41-4ubuntu3.23) ...\r\nSetting up apache2 (2.4.41-4ubuntu3.23) ...\r\nEnabling module mpm_event.\r\nEnabling module authz_core.\r\nEnabling module authz_host.\r\nEnabling module authn_core.\r\nEnabling module auth_basic.\r\nEnabling module access_compat.\r\nEnabling module authn_file.\r\nEnabling module authz_user.\r\nEnabling module alias.\r\nEnabling module dir.\r\nEnabling module autoindex.\r\nEnabling module env.\r\nEnabling module mime.\r\nEnabling module negotiation.\r\nEnabling module setenvif.\r\nEnabling module filter.\r\nEnabling module deflate.\r\nEnabling module status.\r\nEnabling module reqtimeout.\r\nEnabling conf charset.\r\nEnabling conf localized-error-pages.\r\nEnabling conf other-vhosts-access-log.\r\nEnabling conf security.\r\nEnabling conf serve-cgi-bin.\r\nEnabling site 000-default.\r\nCreated symlink /etc/systemd/system/multi-user.target.wants/apache2.service → /lib/systemd/system/apache2.service.\r\nCreated symlink /etc/systemd/system/multi-user.target.wants/apache-htcacheclean.service → /lib/systemd/system/apache-htcacheclean.service.\r\nProcessing triggers for ufw (0.36-6ubuntu1.1) ...\r\nProcessing triggers for systemd (245.4-4ubuntu3.24) ...\r\nProcessing triggers for man-db (2.9.1-1) ...\r\nProcessing triggers for libc-bin (2.31-0ubuntu9.17) ...\r\n", "stdout_lines": ["Reading package lists...", "Building dependency tree...", "Reading state information...", "The following additional packages will be installed:", "  apache2-bin apache2-data apache2-utils libapr1 libaprutil1", "  libaprutil1-dbd-sqlite3 libaprutil1-ldap libjansson4 liblua5.2-0 ssl-cert", "Suggested packages:", "  apache2-doc apache2-suexec-pristine | apache2-suexec-custom www-browser", "  openssl-blacklist", "The following NEW packages will be installed:", "  apache2 apache2-bin apache2-data apache2-utils libapr1 libaprutil1", "  libaprutil1-dbd-sqlite3 libaprutil1-ldap libjansson4 liblua5.2-0 ssl-cert", "0 upgraded, 11 newly installed, 0 to remove and 26 not upgraded.", "Need to get 1874 kB of archives.", "After this operation, 8121 kB of additional disk space will be used.", "Get:1 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libapr1 amd64 1.6.5-1ubuntu1.1 [91.5 kB]", "Get:2 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libaprutil1 amd64 1.6.1-4ubuntu2.2 [85.1 kB]", "Get:3 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libaprutil1-dbd-sqlite3 amd64 1.6.1-4ubuntu2.2 [10.5 kB]", "Get:4 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 libaprutil1-ldap amd64 1.6.1-4ubuntu2.2 [8752 B]", "Get:5 http://azure.archive.ubuntu.com/ubuntu focal/main amd64 libjansson4 amd64 2.12-1build1 [28.9 kB]", "Get:6 http://azure.archive.ubuntu.com/ubuntu focal/main amd64 liblua5.2-0 amd64 5.2.4-1.1build3 [106 kB]", "Get:7 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2-bin amd64 2.4.41-4ubuntu3.23 [1188 kB]", "Get:8 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2-data all 2.4.41-4ubuntu3.23 [159 kB]", "Get:9 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2-utils amd64 2.4.41-4ubuntu3.23 [84.4 kB]", "Get:10 http://azure.archive.ubuntu.com/ubuntu focal-updates/main amd64 apache2 amd64 2.4.41-4ubuntu3.23 [95.6 kB]", "Get:11 http://azure.archive.ubuntu.com/ubuntu focal/main amd64 ssl-cert all 1.0.39 [17.0 kB]", "Preconfiguring packages ...", "Fetched 1874 kB in 0s (9557 kB/s)", "Selecting previously unselected package libapr1:amd64.", "(Reading database ... ", "(Reading database ... 5%", "(Reading database ... 10%", "(Reading database ... 15%", "(Reading database ... 20%", "(Reading database ... 25%", "(Reading database ... 30%", "(Reading database ... 35%", "(Reading database ... 40%", "(Reading database ... 45%", "(Reading database ... 50%", "(Reading database ... 55%", "(Reading database ... 60%", "(Reading database ... 65%", "(Reading database ... 70%", "(Reading database ... 75%", "(Reading database ... 80%", "(Reading database ... 85%", "(Reading database ... 90%", "(Reading database ... 95%", "(Reading database ... 100%", "(Reading database ... 59172 files and directories currently installed.)", "Preparing to unpack .../00-libapr1_1.6.5-1ubuntu1.1_amd64.deb ...", "Unpacking libapr1:amd64 (1.6.5-1ubuntu1.1) ...", "Selecting previously unselected package libaprutil1:amd64.", "Preparing to unpack .../01-libaprutil1_1.6.1-4ubuntu2.2_amd64.deb ...", "Unpacking libaprutil1:amd64 (1.6.1-4ubuntu2.2) ...", "Selecting previously unselected package libaprutil1-dbd-sqlite3:amd64.", "Preparing to unpack .../02-libaprutil1-dbd-sqlite3_1.6.1-4ubuntu2.2_amd64.deb ...", "Unpacking libaprutil1-dbd-sqlite3:amd64 (1.6.1-4ubuntu2.2) ...", "Selecting previously unselected package libaprutil1-ldap:amd64.", "Preparing to unpack .../03-libaprutil1-ldap_1.6.1-4ubuntu2.2_amd64.deb ...", "Unpacking libaprutil1-ldap:amd64 (1.6.1-4ubuntu2.2) ...", "Selecting previously unselected package libjansson4:amd64.", "Preparing to unpack .../04-libjansson4_2.12-1build1_amd64.deb ...", "Unpacking libjansson4:amd64 (2.12-1build1) ...", "Selecting previously unselected package liblua5.2-0:amd64.", "Preparing to unpack .../05-liblua5.2-0_5.2.4-1.1build3_amd64.deb ...", "Unpacking liblua5.2-0:amd64 (5.2.4-1.1build3) ...", "Selecting previously unselected package apache2-bin.", "Preparing to unpack .../06-apache2-bin_2.4.41-4ubuntu3.23_amd64.deb ...", "Unpacking apache2-bin (2.4.41-4ubuntu3.23) ...", "Selecting previously unselected package apache2-data.", "Preparing to unpack .../07-apache2-data_2.4.41-4ubuntu3.23_all.deb ...", "Unpacking apache2-data (2.4.41-4ubuntu3.23) ...", "Selecting previously unselected package apache2-utils.", "Preparing to unpack .../08-apache2-utils_2.4.41-4ubuntu3.23_amd64.deb ...", "Unpacking apache2-utils (2.4.41-4ubuntu3.23) ...", "Selecting previously unselected package apache2.", "Preparing to unpack .../09-apache2_2.4.41-4ubuntu3.23_amd64.deb ...", "Unpacking apache2 (2.4.41-4ubuntu3.23) ...", "Selecting previously unselected package ssl-cert.", "Preparing to unpack .../10-ssl-cert_1.0.39_all.deb ...", "Unpacking ssl-cert (1.0.39) ...", "Setting up libapr1:amd64 (1.6.5-1ubuntu1.1) ...", "Setting up libjansson4:amd64 (2.12-1build1) ...", "Setting up ssl-cert (1.0.39) ...", "Setting up liblua5.2-0:amd64 (5.2.4-1.1build3) ...", "Setting up apache2-data (2.4.41-4ubuntu3.23) ...", "Setting up libaprutil1:amd64 (1.6.1-4ubuntu2.2) ...", "Setting up libaprutil1-ldap:amd64 (1.6.1-4ubuntu2.2) ...", "Setting up libaprutil1-dbd-sqlite3:amd64 (1.6.1-4ubuntu2.2) ...", "Setting up apache2-utils (2.4.41-4ubuntu3.23) ...", "Setting up apache2-bin (2.4.41-4ubuntu3.23) ...", "Setting up apache2 (2.4.41-4ubuntu3.23) ...", "Enabling module mpm_event.", "Enabling module authz_core.", "Enabling module authz_host.", "Enabling module authn_core.", "Enabling module auth_basic.", "Enabling module access_compat.", "Enabling module authn_file.", "Enabling module authz_user.", "Enabling module alias.", "Enabling module dir.", "Enabling module autoindex.", "Enabling module env.", "Enabling module mime.", "Enabling module negotiation.", "Enabling module setenvif.", "Enabling module filter.", "Enabling module deflate.", "Enabling module status.", "Enabling module reqtimeout.", "Enabling conf charset.", "Enabling conf localized-error-pages.", "Enabling conf other-vhosts-access-log.", "Enabling conf security.", "Enabling conf serve-cgi-bin.", "Enabling site 000-default.", "Created symlink /etc/systemd/system/multi-user.target.wants/apache2.service → /lib/systemd/system/apache2.service.", "Created symlink /etc/systemd/system/multi-user.target.wants/apache-htcacheclean.service → /lib/systemd/system/apache-htcacheclean.service.", "Processing triggers for ufw (0.36-6ubuntu1.1) ...", "Processing triggers for systemd (245.4-4ubuntu3.24) ...", "Processing triggers for man-db (2.9.1-1) ...", "Processing triggers for libc-bin (2.31-0ubuntu9.17) ..."]}
+
+TASK [Ensure Apache is running] ************************************************
+ok: [172.191.11.131] => {"changed": false, "enabled": true, "name": "apache2", "state": "started", "status": {"ActiveEnterTimestamp": "Mon 2025-06-16 04:43:09 UTC", "ActiveEnterTimestampMonotonic": "4839750372", "ActiveExitTimestampMonotonic": "0", "ActiveState": "active", "After": "systemd-journald.socket system.slice systemd-tmpfiles-setup.service sysinit.target -.mount remote-fs.target nss-lookup.target basic.target network.target", "AllowIsolate": "no", "AllowedCPUs": "", "AllowedMemoryNodes": "", "AmbientCapabilities": "", "AssertResult": "yes", "AssertTimestamp": "Mon 2025-06-16 04:43:09 UTC", "AssertTimestampMonotonic": "4839708389", "Before": "shutdown.target multi-user.target", "BlockIOAccounting": "no", "BlockIOWeight": "[not set]", "CPUAccounting": "no", "CPUAffinity": "", "CPUAffinityFromNUMA": "no", "CPUQuotaPerSecUSec": "infinity", "CPUQuotaPeriodUSec": "infinity", "CPUSchedulingPolicy": "0", "CPUSchedulingPriority": "0", "CPUSchedulingResetOnFork": "no", "CPUShares": "[not set]", "CPUUsageNSec": "[not set]", "CPUWeight": "[not set]", "CacheDirectoryMode": "0755", "CanIsolate": "no", "CanReload": "yes", "CanStart": "yes", "CanStop": "yes", "CapabilityBoundingSet": "cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read 0x26 0x27 0x28", "CleanResult": "success", "CollectMode": "inactive", "ConditionResult": "yes", "ConditionTimestamp": "Mon 2025-06-16 04:43:09 UTC", "ConditionTimestampMonotonic": "4839708388", "ConfigurationDirectoryMode": "0755", "Conflicts": "shutdown.target", "ControlGroup": "/system.slice/apache2.service", "ControlPID": "0", "DefaultDependencies": "yes", "DefaultMemoryLow": "0", "DefaultMemoryMin": "0", "Delegate": "no", "Description": "The Apache HTTP Server", "DevicePolicy": "auto", "Documentation": "https://httpd.apache.org/docs/2.4/", "DynamicUser": "no", "EffectiveCPUs": "", "EffectiveMemoryNodes": "", "Environment": "APACHE_STARTED_BY_SYSTEMD=true", "ExecMainCode": "0", "ExecMainExitTimestampMonotonic": "0", "ExecMainPID": "2992", "ExecMainStartTimestamp": "Mon 2025-06-16 04:43:09 UTC", "ExecMainStartTimestampMonotonic": "4839750352", "ExecMainStatus": "0", "ExecReload": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl graceful ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecReloadEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl graceful ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStart": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStartEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStop": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl stop ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStopEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl stop ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "FailureAction": "none", "FileDescriptorStoreMax": "0", "FinalKillSignal": "9", "FragmentPath": "/lib/systemd/system/apache2.service", "GID": "[not set]", "GuessMainPID": "yes", "IOAccounting": "no", "IOReadBytes": "18446744073709551615", "IOReadOperations": "18446744073709551615", "IOSchedulingClass": "0", "IOSchedulingPriority": "0", "IOWeight": "[not set]", "IOWriteBytes": "18446744073709551615", "IOWriteOperations": "18446744073709551615", "IPAccounting": "no", "IPEgressBytes": "[no data]", "IPEgressPackets": "[no data]", "IPIngressBytes": "[no data]", "IPIngressPackets": "[no data]", "Id": "apache2.service", "IgnoreOnIsolate": "no", "IgnoreSIGPIPE": "yes", "InactiveEnterTimestampMonotonic": "0", "InactiveExitTimestamp": "Mon 2025-06-16 04:43:09 UTC", "InactiveExitTimestampMonotonic": "4839710156", "InvocationID": "68e5257a1b474ac9bbf828bc874c237f", "JobRunningTimeoutUSec": "infinity", "JobTimeoutAction": "none", "JobTimeoutUSec": "infinity", "KeyringMode": "private", "KillMode": "control-group", "KillSignal": "15", "LimitAS": "infinity", "LimitASSoft": "infinity", "LimitCORE": "infinity", "LimitCORESoft": "0", "LimitCPU": "infinity", "LimitCPUSoft": "infinity", "LimitDATA": "infinity", "LimitDATASoft": "infinity", "LimitFSIZE": "infinity", "LimitFSIZESoft": "infinity", "LimitLOCKS": "infinity", "LimitLOCKSSoft": "infinity", "LimitMEMLOCK": "65536", "LimitMEMLOCKSoft": "65536", "LimitMSGQUEUE": "819200", "LimitMSGQUEUESoft": "819200", "LimitNICE": "0", "LimitNICESoft": "0", "LimitNOFILE": "524288", "LimitNOFILESoft": "1024", "LimitNPROC": "3544", "LimitNPROCSoft": "3544", "LimitRSS": "infinity", "LimitRSSSoft": "infinity", "LimitRTPRIO": "0", "LimitRTPRIOSoft": "0", "LimitRTTIME": "infinity", "LimitRTTIMESoft": "infinity", "LimitSIGPENDING": "3544", "LimitSIGPENDINGSoft": "3544", "LimitSTACK": "infinity", "LimitSTACKSoft": "8388608", "LoadState": "loaded", "LockPersonality": "no", "LogLevelMax": "-1", "LogRateLimitBurst": "0", "LogRateLimitIntervalUSec": "0", "LogsDirectoryMode": "0755", "MainPID": "2992", "MemoryAccounting": "yes", "MemoryCurrent": "9576448", "MemoryDenyWriteExecute": "no", "MemoryHigh": "infinity", "MemoryLimit": "infinity", "MemoryLow": "0", "MemoryMax": "infinity", "MemoryMin": "0", "MemorySwapMax": "infinity", "MountAPIVFS": "no", "MountFlags": "", "NFileDescriptorStore": "0", "NRestarts": "0", "NUMAMask": "", "NUMAPolicy": "n/a", "Names": "apache2.service", "NeedDaemonReload": "no", "Nice": "0", "NoNewPrivileges": "no", "NonBlocking": "no", "NotifyAccess": "none", "OOMPolicy": "stop", "OOMScoreAdjust": "0", "OnFailureJobMode": "replace", "Perpetual": "no", "PrivateDevices": "no", "PrivateMounts": "no", "PrivateNetwork": "no", "PrivateTmp": "yes", "PrivateUsers": "no", "ProtectControlGroups": "no", "ProtectHome": "no", "ProtectHostname": "no", "ProtectKernelLogs": "no", "ProtectKernelModules": "no", "ProtectKernelTunables": "no", "ProtectSystem": "no", "RefuseManualStart": "no", "RefuseManualStop": "no", "ReloadResult": "success", "RemainAfterExit": "no", "RemoveIPC": "no", "Requires": "sysinit.target -.mount system.slice", "RequiresMountsFor": "/tmp /var/tmp", "Restart": "on-abort", "RestartKillSignal": "15", "RestartUSec": "100ms", "RestrictNamespaces": "no", "RestrictRealtime": "no", "RestrictSUIDSGID": "no", "Result": "success", "RootDirectoryStartOnly": "no", "RuntimeDirectoryMode": "0755", "RuntimeDirectoryPreserve": "no", "RuntimeMaxUSec": "infinity", "SameProcessGroup": "no", "SecureBits": "0", "SendSIGHUP": "no", "SendSIGKILL": "yes", "Slice": "system.slice", "StandardError": "inherit", "StandardInput": "null", "StandardInputData": "", "StandardOutput": "journal", "StartLimitAction": "none", "StartLimitBurst": "5", "StartLimitIntervalUSec": "10s", "StartupBlockIOWeight": "[not set]", "StartupCPUShares": "[not set]", "StartupCPUWeight": "[not set]", "StartupIOWeight": "[not set]", "StateChangeTimestamp": "Mon 2025-06-16 04:43:09 UTC", "StateChangeTimestampMonotonic": "4839750372", "StateDirectoryMode": "0755", "StatusErrno": "0", "StopWhenUnneeded": "no", "SubState": "running", "SuccessAction": "none", "SyslogFacility": "3", "SyslogLevel": "6", "SyslogLevelPrefix": "yes", "SyslogPriority": "30", "SystemCallErrorNumber": "0", "TTYReset": "no", "TTYVHangup": "no", "TTYVTDisallocate": "no", "TasksAccounting": "yes", "TasksCurrent": "55", "TasksMax": "1063", "TimeoutAbortUSec": "1min 30s", "TimeoutCleanUSec": "infinity", "TimeoutStartUSec": "1min 30s", "TimeoutStopUSec": "1min 30s", "TimerSlackNSec": "50000", "Transient": "no", "Type": "forking", "UID": "[not set]", "UMask": "0022", "UnitFilePreset": "enabled", "UnitFileState": "enabled", "UtmpMode": "init", "WantedBy": "multi-user.target", "WatchdogSignal": "6", "WatchdogTimestampMonotonic": "0", "WatchdogUSec": "0"}}
+
+TASK [Copy website files] ******************************************************
+changed: [172.191.11.131] => {"changed": true, "checksum": "8405b5fe12fc983a6ea329c7da81abfb33636880", "dest": "/var/www/html/index.html", "gid": 33, "group": "www-data", "md5sum": "5c12a2a0cd19b9178cf5acb660523b66", "mode": "0644", "owner": "www-data", "size": 1239, "src": "/home/adminuser/.ansible/tmp/ansible-tmp-1750049055.0193799-6225-92402795115350/.source.html", "state": "file", "uid": 33}
+
+TASK [Ensure correct permissions on /var/www/html] *****************************
+changed: [172.191.11.131] => {"changed": true, "gid": 33, "group": "www-data", "mode": "0755", "owner": "www-data", "path": "/var/www/html", "size": 4096, "state": "directory", "uid": 33}
+
+PLAY RECAP *********************************************************************
+172.191.11.131             : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Verify Deployment)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ cd terraform
++ terraform output -raw public_ip_address
+[Pipeline] sh
++ curl -s http://172.191.11.131
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Pipeline Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1a73e8;
+        }
+        p {
+            color: #5f6368;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to DevOps Pipeline Demo</h1>
+        <p>This page was deployed using:</p>
+        <ul style="list-style: none; padding: 0;">
+            <li>✅ Jenkins Pipeline</li>
+            <li>✅ Terraform on Azure</li>
+            <li>✅ Ansible Configuration</li>
+            <li>✅ Docker</li>
+        </ul>
+        <p>Deployment successful!</p>
+    </div>
+</body>
+</html>
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Pipeline completed successfully!
+[Pipeline] sh
++ rm -f jenkins_ssh_key jenkins_ssh_key.pub
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS

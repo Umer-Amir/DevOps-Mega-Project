@@ -23,6 +23,9 @@ project/
 │   └── install_web.yml  # Web server configuration playbook
 ├── app/
 │   └── index.html      # Static web application
+├── logs/               # Execution logs for debugging
+│   ├── 22nd Build Success.txt
+│   └── 25th Build Success.txt
 ├── Dockerfile          # Custom Jenkins image with tools
 ├── Jenkinsfile        # Pipeline definition
 └── .gitignore        # Git ignore patterns
@@ -75,6 +78,17 @@ project/
      - Azure service principal (as Secret text)
      - SSH private key (as Secret file)
 
+## 📊 Logging and Debugging
+
+The project includes a comprehensive logging system to help with troubleshooting and debugging:
+
+1. **Pipeline Logs**:
+   - General pipeline execution logs in `logs/pipeline/`
+   - Stage-by-stage execution details
+   - Error messages and stack traces
+
+You can check these logs at any time during or after pipeline execution to understand what happened and debug any issues that arise.
+
 ## 🚨 Challenges & Solutions
 
 ### 1. Terraform Provider Issues
@@ -117,6 +131,15 @@ project/
   - Added resource naming strategy
   - Implemented proper cleanup in Terraform
   - Made Ansible playbooks idempotent
+
+### 6. Docker and WSL Integration Issues
+
+- **Challenge**: Jenkins container couldn't properly communicate with Terraform through WSL
+- **Solution**:
+  - Created custom Dockerfile to package all tools (Terraform, Ansible, Azure CLI) directly in the container
+  - Eliminated dependency on WSL-based tool execution
+  - Added proper environment setup in Dockerfile
+  - Ensured all tools run natively within the container
 
 ## 🏃‍♂️ Running the Pipeline
 
