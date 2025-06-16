@@ -2,10 +2,10 @@ pipeline {
     agent any
     
     environment {
-        AZURE_SUBSCRIPTION_ID = credentials('AZURE_SUBSCRIPTION_ID')
-        AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
-        AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
-        AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
+        ARM_SUBSCRIPTION_ID = credentials('AZURE_SUBSCRIPTION_ID')
+        ARM_CLIENT_ID = credentials('AZURE_CLIENT_ID')
+        ARM_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
+        ARM_TENANT_ID = credentials('AZURE_TENANT_ID')
     }
 
     stages {
@@ -18,13 +18,7 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    sh """
-                    terraform init \
-                    -var=\"azure_subscription_id=${AZURE_SUBSCRIPTION_ID}\" \
-                    -var=\"azure_client_id=${AZURE_CLIENT_ID}\" \
-                    -var=\"azure_client_secret=${AZURE_CLIENT_SECRET}\" \
-                    -var=\"azure_tenant_id=${AZURE_TENANT_ID}\"
-                    """
+                    sh 'terraform init'
                 }
             }
         }
@@ -32,13 +26,7 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
-                    sh """
-                    terraform plan -out=tfplan \
-                    -var=\"azure_subscription_id=${AZURE_SUBSCRIPTION_ID}\" \
-                    -var=\"azure_client_id=${AZURE_CLIENT_ID}\" \
-                    -var=\"azure_client_secret=${AZURE_CLIENT_SECRET}\" \
-                    -var=\"azure_tenant_id=${AZURE_TENANT_ID}\"
-                    """
+                    sh 'terraform plan -out=tfplan'
                 }
             }
         }
@@ -46,13 +34,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    sh """
-                    terraform apply -auto-approve tfplan \
-                    -var=\"azure_subscription_id=${AZURE_SUBSCRIPTION_ID}\" \
-                    -var=\"azure_client_id=${AZURE_CLIENT_ID}\" \
-                    -var=\"azure_client_secret=${AZURE_CLIENT_SECRET}\" \
-                    -var=\"azure_tenant_id=${AZURE_TENANT_ID}\"
-                    """
+                    sh 'terraform apply -auto-approve tfplan'
                 }
             }
         }
