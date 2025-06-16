@@ -2,7 +2,4 @@
 
 # Terraform
 .terraform/
-*.tfstate
-*.tfstate.backup
-*.log
-crash.log
+"terraform/.terraform/" 
