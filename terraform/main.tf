@@ -9,7 +9,6 @@ terraform {
 
 provider "azurerm" {
   features {}
-  use_cli = false
 }
 
 # Create Resource Group
