@@ -9,9 +9,8 @@ pipeline {
         TF_IN_AUTOMATION = 'true'
     }
 
-    stages {
-        stage('Setup SSH Key') {
-            steps {[]
+    stages {        stage('Setup SSH Key') {
+            steps {
                 script {
                     // Write the SSH private key
                     withCredentials([file(credentialsId: 'jenkins_ssh_key', variable: 'SSH_KEY_FILE')]) {
