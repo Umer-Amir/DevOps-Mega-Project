@@ -90,10 +90,10 @@ pipeline {
                         sleep(time: 30, unit: 'SECONDS')                        // Verify key permissions before SSH test
                         sh 'chmod 600 jenkins_ssh_key'
                         def sshTest = sh(
-                            script: '''
+                            script: """
                                 ls -l jenkins_ssh_key
                                 ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@${publicIP} echo 'SSH connection test' 2>&1
-                            ''',
+                            """,
                             returnStatus: true
                         )
                         if (sshTest == 0) {
