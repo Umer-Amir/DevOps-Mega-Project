@@ -1,1 +1,8 @@
 "jenkins_ssh_key*"  
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.log
+crash.log
