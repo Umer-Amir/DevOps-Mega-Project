@@ -1,5 +1,26 @@
-"jenkins_ssh_key*"  
+# SSH Keys
+jenkins_ssh_key*
+ssh_key*
 
 # Terraform
 .terraform/
-"terraform/.terraform/" 
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+crash.*.log
+
+# Local .terraform directories
+**/.terraform/*
+
+# Terraform provider binary
+terraform-provider-*
+
+# Local development
+.env
+.vscode/
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
