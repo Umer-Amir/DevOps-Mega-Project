@@ -9,23 +9,29 @@ pipeline {
         TF_IN_AUTOMATION = 'true'
     }
 
-    stages {        stage('Setup SSH Key') {
+    stages {
+        stage('Setup SSH Key') {
             steps {
-                script {                    // Write the SSH private key with correct permissions
+                script {
+                    // Clean up any existing keys
+                    sh 'rm -f jenkins_ssh_key jenkins_ssh_key.pub'
+                    
+                    // Write the SSH private key with correct permissions
                     withCredentials([file(credentialsId: 'jenkins_ssh_key', variable: 'SSH_KEY_FILE')]) {
-                        sh '''
-                            cp "$SSH_KEY_FILE" jenkins_ssh_key
+                        sh """
+                            cp "\$SSH_KEY_FILE" jenkins_ssh_key
                             chmod 600 jenkins_ssh_key
                             ls -l jenkins_ssh_key
-                        '''
+                        """
                     }
+                    
                     // Write the SSH public key
                     withCredentials([file(credentialsId: 'jenkins_ssh_key_pub', variable: 'SSH_KEY_PUB_FILE')]) {
-                        sh '''
-                            cp "$SSH_KEY_PUB_FILE" jenkins_ssh_key.pub
+                        sh """
+                            cp "\$SSH_KEY_PUB_FILE" jenkins_ssh_key.pub
                             chmod 644 jenkins_ssh_key.pub
                             ls -l jenkins_ssh_key.pub
-                        '''
+                        """
                     }
                 }
             }
@@ -60,7 +66,8 @@ pipeline {
                 }
             }
         }
-          stage('Wait for VM') {
+        
+        stage('Wait for VM') {
             steps {
                 script {
                     def maxRetries = 20
@@ -68,6 +75,7 @@ pipeline {
                     def sshReady = false
                     
                     // Wait for IP assignment
+                    echo "Waiting for public IP assignment..."
                     for (int i = 0; i < maxRetries && !publicIP; i++) {
                         sleep(time: 30, unit: 'SECONDS')
                         publicIP = sh(
@@ -84,15 +92,17 @@ pipeline {
                     
                     if (!publicIP) {
                         error "Failed to get public IP after ${maxRetries} attempts"
-                    }                    // Wait for SSH to be ready
+                    }
+
+                    // Wait for SSH to be ready
                     echo "Waiting for SSH to be ready..."
                     for (int i = 0; i < maxRetries && !sshReady; i++) {
-                        sleep(time: 30, unit: 'SECONDS')                        // Verify key permissions before SSH test
+                        sleep(time: 30, unit: 'SECONDS')
+                        // Ensure key permissions before each attempt
                         sh 'chmod 600 jenkins_ssh_key'
                         def sshTest = sh(
                             script: """
-                                ls -l jenkins_ssh_key
-                                ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@${publicIP} echo 'SSH connection test' 2>&1
+                                ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@${publicIP} echo 'SSH connection test'
                             """,
                             returnStatus: true
                         )
@@ -123,16 +133,25 @@ pipeline {
                     ).trim()
                     
                     if (!publicIP) {
-                        error "Public IP is not available"
+                        error "Could not get VM's public IP address"
                     }
                     
-                    // Create inventory file in project root
+                    // Create inventory file
                     writeFile file: 'inventory.ini', text: """[webserver]
 ${publicIP} ansible_ssh_user=adminuser ansible_ssh_private_key_file=${WORKSPACE}/jenkins_ssh_key ansible_host_key_checking=False"""
                     
-                    // Run ansible-playbook from project root
-                    sh 'ls -la' // Debug: list files
-                    sh 'cat inventory.ini' // Debug: show inventory content
+                    // Show debug information
+                    sh '''
+                        echo "=== Debug Information ==="
+                        echo "Current directory:"
+                        pwd
+                        echo "Inventory file contents:"
+                        cat inventory.ini
+                        echo "SSH key permissions:"
+                        ls -l jenkins_ssh_key
+                    '''
+                    
+                    // Run Ansible playbook
                     sh 'ansible-playbook -i inventory.ini -v ansible/install_web.yml'
                 }
             }
@@ -146,21 +165,34 @@ ${publicIP} ansible_ssh_user=adminuser ansible_ssh_private_key_file=${WORKSPACE}
                         returnStdout: true
                     ).trim()
                     
-                    sh "curl -s http://${publicIP}"
+                    // Wait for web server to be ready
+                    sleep(time: 30, unit: 'SECONDS')
+                    
+                    // Test HTTP connection
+                    def httpTest = sh(
+                        script: "curl -s -f http://${publicIP}",
+                        returnStatus: true
+                    )
+                    
+                    if (httpTest == 0) {
+                        echo "Web server is accessible!"
+                    } else {
+                        error "Failed to access web server"
+                    }
                 }
             }
         }
     }
     
     post {
-        failure {
-            echo 'Pipeline failed! Check logs for details.'
+        always {
+            sh 'rm -f jenkins_ssh_key jenkins_ssh_key.pub'
         }
         success {
             echo 'Pipeline completed successfully!'
         }
-        cleanup {
-            sh 'rm -f jenkins_ssh_key jenkins_ssh_key.pub'
+        failure {
+            echo 'Pipeline failed! Check logs for details.'
         }
     }
 }

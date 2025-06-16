@@ -32,19 +32,6 @@
         owner: www-data
         group: www-data
 
-    - name: Remove default Apache web page
-      file:
-        path: /var/www/html/index.html
-        state: absent
-
-    - name: Copy website files
-      copy:
-        src: ../app/
-        dest: /var/www/html/
-        mode: '0644'
-        owner: www-data
-        group: www-data
-
     - name: Ensure correct permissions on /var/www/html
       file:
         path: /var/www/html
