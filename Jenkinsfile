@@ -78,14 +78,12 @@ pipeline {
                     
                     if (!publicIP) {
                         error "Failed to get public IP after ${maxRetries} attempts"
-                    }
-
-                    // Wait for SSH to be ready
+                    }                    // Wait for SSH to be ready
                     echo "Waiting for SSH to be ready..."
                     for (int i = 0; i < maxRetries && !sshReady; i++) {
                         sleep(time: 30, unit: 'SECONDS')
                         def sshTest = sh(
-                            script: "nc -zv -w 5 ${publicIP} 22 2>&1",
+                            script: "ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@${publicIP} echo 'SSH connection test' 2>&1",
                             returnStatus: true
                         )
                         if (sshTest == 0) {
