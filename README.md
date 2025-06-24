@@ -19,8 +19,6 @@ After extensive debugging and community research, it became clear that this was 
 All logs related to Jenkins pipeline builds (success or failure) are stored in the `logs/` directory and can be viewed to understand the execution flow and troubleshoot any failures. These logs capture:
 
 - Jenkins build output
-- Terraform apply/destroy logs
-- Ansible execution output
 
 ---
 
