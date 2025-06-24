@@ -4,6 +4,50 @@ This project implements a fully automated DevOps pipeline using Jenkins (in Dock
 
 ![Project Diagram](Project.png)
 
+## ❗ Critical Issues Faced + Notes
+
+### WSL + Docker Integration Problem
+
+One major issue encountered was running Docker commands directly (e.g., `docker run`) outside of a Dockerfile-based setup. While the Jenkins container itself worked fine, Terraform inside the container was not being detected or executed properly. This was due to **WSL and Docker Desktop integration problems**, where Terraform binaries were not accessible inside the Docker runtime even when they were seemingly set up correctly.
+
+After extensive debugging and community research, it became clear that this was a **known issue with WSL's Docker bridge**, especially when using shared volumes or trying to execute CLI tools like Terraform from mounted paths. The final fix was to **package all required tools (Terraform, Ansible, Azure CLI, etc.) directly inside a custom Docker image via Dockerfile**, removing WSL as a dependency completely.
+
+---
+
+### ✅ Logs for Debugging
+
+All logs related to Jenkins pipeline builds (success or failure) are stored in the `logs/` directory and can be viewed to understand the execution flow and troubleshoot any failures. These logs capture:
+
+- Jenkins build output
+- Terraform apply/destroy logs
+- Ansible execution output
+
+---
+
+### 🤖 AI Assistance Acknowledgment
+
+During development, **GitHub Copilot** and **ChatGPT** were used for idea generation and syntax support. However, the final pipeline and its entire execution flow were built and debugged with **100% understanding** of:
+
+- All syntax and configurations
+- CLI commands used across tools
+- How the pipeline works end-to-end
+- The deployment flow from infrastructure to app delivery
+
+This project was not blindly copied; every line of code was understood and adapted with clear intent.
+
+---
+
+### ⚠️ terraform.tfstate Warning
+
+The `terraform.tfstate` file reflects the **latest resource state** from a previously successful pipeline run. It includes:
+
+- VM instance
+- NSG rules
+- Public IP and NIC
+- Other provisioned Azure resources
+
+If you plan to re-use this pipeline or test infrastructure changes, **review or reset the state file** accordingly to avoid resource conflicts or unintended behavior.
+
 ## 🚀 Technology Stack
 
 - **Docker** - Containerized Jenkins with all required tools
