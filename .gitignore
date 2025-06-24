@@ -5,8 +5,8 @@ ssh_key*
 # Terraform
 terraform/.terraform/*
 .terraform/
-*.tfstate
-*.tfstate.*
+# q*.tfstate
+# q*.tfstate.*
 .terraform.lock.hcl
 crash.log
 crash.*.log

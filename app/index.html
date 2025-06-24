@@ -1,237 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DevOps Pipeline Demo</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DevOps Pipeline Success</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --hue: 160;
+    }
 
-      body {
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      .container {
-        text-align: center;
-        max-width: 850px;
-        padding: 2.5rem;
-        background: rgba(255, 255, 255, 0.07);
-        border-radius: 20px;
-        backdrop-filter: blur(8px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(-45deg,
+        hsl(var(--hue), 70%, 40%),
+        hsl(calc(var(--hue) + 40), 80%, 60%),
+        hsl(calc(var(--hue) + 80), 90%, 30%),
+        hsl(calc(var(--hue) + 120), 80%, 60%)
+      );
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      transition: background 0.5s ease;
+    }
 
-      h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-      }
+    @keyframes gradientMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
 
-      .subtitle {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-        opacity: 0.95;
-      }
+    .card {
+      max-width: 950px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 1.2s ease;
+    }
 
-      .tech-stack {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin: 2.5rem 0;
-      }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
 
-      .tech-item {
-        background: rgba(255, 255, 255, 0.18);
-        padding: 1rem;
-        border-radius: 12px;
-        transition: transform 0.3s ease;
-      }
+    .card h1 {
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
 
-      .tech-item:hover {
-        transform: translateY(-6px);
-        background: rgba(255, 255, 255, 0.3);
-      }
+    .card h1 i {
+      color: #ffd700;
+      margin-right: 0.5rem;
+      animation: bounce 1.5s infinite;
+    }
 
-      .tech-item h3 {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-      }
+    @keyframes bounce {
+      0%, 100% {transform: translateY(0);}
+      50% {transform: translateY(-5px);}
+    }
 
-      .success-message {
-        background: rgba(76, 175, 80, 0.25);
-        border: 2px solid rgba(76, 175, 80, 0.5);
-        padding: 1rem;
-        border-radius: 12px;
-        margin: 2rem 0;
-      }
+    .subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
 
-      .pipeline-info {
-        background: rgba(0, 150, 136, 0.3);
-        border: 2px solid rgba(0, 150, 136, 0.6);
-        padding: 1rem;
-        border-radius: 12px;
-        margin: 2rem 0;
-      }
+    .section {
+      margin: 2rem 0;
+    }
 
-      .footer {
-        margin-top: 2rem;
-        font-size: 0.9rem;
-        opacity: 0.85;
-      }
+    .section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 600;
+      color: #fff;
+    }
 
-      .student-info {
-        background: rgba(255, 255, 255, 0.15);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin: 2rem 0;
-        text-align: left;
-      }
+    .section h2 i {
+      color: #ffd700;
+    }
 
-      .student-info h2 {
-        text-align: center;
-        margin-bottom: 1rem;
-        color: #fff;
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-      }
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1rem;
+    }
 
-      .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-        font-size: 1rem;
-      }
+    .student-item {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 1rem;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+    }
 
-      .info-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      }
+    .student-item label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #ffe97f;
+      margin-bottom: 0.3rem;
+    }
 
-      .info-label {
-        font-weight: bold;
-        color: #ffd700;
-      }
+    .student-item span {
+      font-size: 1.05rem;
+      color: white;
+    }
 
-      .info-value {
-        color: #fff;
-      }
+    .list {
+      list-style: none;
+      padding-left: 0;
+      display: grid;
+      gap: 0.8rem;
+    }
 
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
+    .list li {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+    }
 
-      .pulse {
-        animation: pulse 2s infinite;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1 class="pulse">🚀 DevOps Pipeline Success!</h1>
-      <p class="subtitle">Fully Automated Infrastructure Deployment</p>
+    .list li i {
+      margin-right: 0.6rem;
+      color: #00ffc3;
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
 
-      <div class="student-info">
-        <h2>👨‍🎓 Student Information</h2>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="info-label">Name:</span>
-            <span class="info-value" style="display:block; width:100%; text-align:center;">Umer Amir</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Registration #:</span>
-            <span class="info-value" style="display:block; width:100%; text-align:center;">2112241</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Section:</span>
-            <span class="info-value" style="display:block; width:100%; text-align:center;">A</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Course:</span>
-            <span class="info-value" style="display:block; width:100%; text-align:center;">DevOps</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Instructor:</span>
-            <span class="info-value" style="display:block; width:100%; text-align:center;">Tariq Khan Ghouri</span>
-          </div>
-        </div>
-      </div>
+    .tech-stack {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      text-align: center;
+    }
 
-      <div class="success-message">
-        <h2>✅ Deployment Complete</h2>
-        <p>
-          Your web application has been successfully deployed using a fully
-          automated DevOps pipeline!
-        </p>
-      </div>
+    .tech {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 1rem;
+      border-radius: 12px;
+      transition: transform 0.3s, background 0.3s;
+    }
 
-      <div class="pipeline-info">
-        <h2>🔄 Pipeline Stages Completed</h2>
-        <ul style="list-style: none; padding: 0">
-          <li>✅ Jenkins Pipeline Triggered</li>
-          <li>✅ Terraform Infrastructure Provisioned</li>
-          <li>✅ Azure VM Created and Configured</li>
-          <li>✅ Ansible Web Server Installation</li>
-          <li>✅ Application Deployment</li>
-        </ul>
-      </div>
+    .tech:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-5px);
+    }
 
-      <div class="tech-stack">
-        <div class="tech-item">
-          <h3>🐳 Docker</h3>
-          <p>Jenkins containerization</p>
-        </div>
-        <div class="tech-item">
-          <h3>🏗️ Jenkins</h3>
-          <p>CI/CD Automation</p>
-        </div>
-        <div class="tech-item">
-          <h3>🏗️ Terraform</h3>
-          <p>Infrastructure as Code</p>
-        </div>
-        <div class="tech-item">
-          <h3>⚙️ Ansible</h3>
-          <p>Configuration Management</p>
-        </div>
-        <div class="tech-item">
-          <h3>☁️ Azure</h3>
-          <p>Cloud Platform</p>
-        </div>
-        <div class="tech-item">
-          <h3>📚 Git</h3>
-          <p>Version Control</p>
-        </div>
-      </div>
+    .tech i {
+      font-size: 2rem;
+      color: #fffdaf;
+      margin-bottom: 0.4rem;
+    }
 
-      <div class="footer">
-        <p>Deployed on: <span id="deploy-time"></span></p>
-        <p>Server: Ubuntu 22.04 LTS | Web Server: Apache2</p>
+    .tech h3 {
+      font-size: 1rem;
+      margin: 0.4rem 0 0.2rem;
+    }
+
+    .tech p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .btn-group {
+      text-align: center;
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      background-color: #ffffff22;
+      border: 1px solid #ffffff44;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn i {
+      margin-right: 0.5rem;
+    }
+
+    .btn:hover {
+      background-color: #ffffff33;
+      transform: scale(1.05);
+    }
+
+    .counter-display {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .light-mode {
+      filter: invert(1) hue-rotate(180deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1><i class="fas fa-rocket"></i>DevOps Pipeline Success</h1>
+    <p class="subtitle">Everything deployed flawlessly and automatically 🚀</p>
+
+    <div class="section">
+      <h2><i class="fas fa-id-badge"></i> Student Information</h2>
+      <div class="student-grid">
+        <div class="student-item"><label>Name</label><span>Umer Amir</span></div>
+        <div class="student-item"><label>Registration #</label><span>2112241</span></div>
+        <div class="student-item"><label>Section</label><span>A</span></div>
+        <div class="student-item"><label>Course</label><span>DevOps</span></div>
+        <div class="student-item"><label>Instructor</label><span>Tariq Khan Ghouri</span></div>
       </div>
     </div>
 
-    <script>
-      document.getElementById("deploy-time").textContent =
-        new Date().toLocaleString();
-    </script>
-  </body>
+    <div class="section">
+      <h2><i class="fas fa-check-circle"></i> Pipeline Stages</h2>
+      <ul class="list">
+        <li><i class="fas fa-play-circle"></i> Jenkins Pipeline Triggered</li>
+        <li><i class="fas fa-server"></i> Terraform Infrastructure Provisioned</li>
+        <li><i class="fas fa-cloud"></i> Azure VM Created and Configured</li>
+        <li><i class="fas fa-cogs"></i> Ansible Web Server Installation</li>
+        <li><i class="fas fa-code"></i> Application Deployment</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-cubes"></i> Tech Stack</h2>
+      <div class="tech-stack">
+        <div class="tech"><i class="fab fa-docker"></i><h3>Docker</h3><p>Containerization</p></div>
+        <div class="tech"><i class="fas fa-tools"></i><h3>Jenkins</h3><p>CI/CD Automation</p></div>
+        <div class="tech"><i class="fas fa-terminal"></i><h3>Terraform</h3><p>Infrastructure as Code</p></div>
+        <div class="tech"><i class="fas fa-wrench"></i><h3>Ansible</h3><p>Configuration Management</p></div>
+        <div class="tech"><i class="fas fa-cloud"></i><h3>Azure</h3><p>Cloud Platform</p></div>
+        <div class="tech"><i class="fab fa-git-alt"></i><h3>Git</h3><p>Version Control</p></div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>Refresh Page</button>
+      <button class="btn" onclick="incrementCounter()"><i class="fas fa-plus-circle"></i>Increment Counter</button>
+      <button class="btn" onclick="changeHue()"><i class="fas fa-paint-brush"></i>Change Hue</button>
+      <button class="btn" onclick="toggleLightMode()"><i class="fas fa-moon"></i>Toggle Light Mode</button>
+    </div>
+    <p class="counter-display">Counter: <span id="counter">0</span></p>
+
+    <div class="footer">
+      <p>Deployed on: <span id="deploy-time"></span></p>
+      <p>Server: Ubuntu 22.04 LTS | Web Server: Apache2</p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("deploy-time").textContent = new Date().toLocaleString();
+
+    let counter = 0;
+    function incrementCounter() {
+      counter++;
+      document.getElementById("counter").textContent = counter;
+    }
+
+    let hue = 160;
+    function changeHue() {
+      hue = (hue + 40) % 360;
+      document.documentElement.style.setProperty('--hue', hue);
+    }
+
+    function toggleLightMode() {
+      document.body.classList.toggle('light-mode');
+    }
+  </script>
+</body>
 </html>
