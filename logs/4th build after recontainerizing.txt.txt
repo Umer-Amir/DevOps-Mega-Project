@@ -1,0 +1,596 @@
+Started by user azureuser
+Obtained Jenkinsfile from git https://github.com/Umer-Amir/DevOps-Mega-Project.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/DevOps-Pipeline-1
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/DevOps-Pipeline-1/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Umer-Amir/DevOps-Mega-Project.git # timeout=10
+Fetching upstream changes from https://github.com/Umer-Amir/DevOps-Mega-Project.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/Umer-Amir/DevOps-Mega-Project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision a9af2a6261115cc6c2d4836e24d7400524c2fdb3 (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f a9af2a6261115cc6c2d4836e24d7400524c2fdb3 # timeout=10
+Commit message: "Proving that I did this project myself"
+ > git rev-list --no-walk 0f598ce4ca36014327f85b09b2a0c6ae34bb336f # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $ARM_TENANT_ID or $ARM_SUBSCRIPTION_ID or $ARM_CLIENT_ID or $ARM_CLIENT_SECRET
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Setup SSH Key)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ rm -f jenkins_ssh_key jenkins_ssh_key.pub
+[Pipeline] withCredentials
+Masking supported pattern matches of $SSH_KEY_FILE
+[Pipeline] {
+[Pipeline] sh
++ cp **** jenkins_ssh_key
++ chmod 600 jenkins_ssh_key
++ ls -l jenkins_ssh_key
+-rw------- 1 jenkins jenkins 3369 Jun 24 13:57 jenkins_ssh_key
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] withCredentials
+Masking supported pattern matches of $SSH_KEY_PUB_FILE
+[Pipeline] {
+[Pipeline] sh
++ cp **** jenkins_ssh_key.pub
++ chmod 644 jenkins_ssh_key.pub
++ ls -l jenkins_ssh_key.pub
+-rw-r--r-- 1 jenkins jenkins 737 Jun 24 13:57 jenkins_ssh_key.pub
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/DevOps-Pipeline-1/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Umer-Amir/DevOps-Mega-Project.git # timeout=10
+Fetching upstream changes from https://github.com/Umer-Amir/DevOps-Mega-Project.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.5'
+ > git fetch --tags --force --progress -- https://github.com/Umer-Amir/DevOps-Mega-Project.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision a9af2a6261115cc6c2d4836e24d7400524c2fdb3 (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f a9af2a6261115cc6c2d4836e24d7400524c2fdb3 # timeout=10
+Commit message: "Proving that I did this project myself"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Terraform Init)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/DevOps-Pipeline-1/terraform
+[Pipeline] {
+[Pipeline] sh
++ terraform init -no-color
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Reusing previous version of hashicorp/azurerm from the dependency lock file
+- Using previously-installed hashicorp/azurerm v3.117.1
+
+Terraform has been successfully initialized!
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Terraform Plan)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/DevOps-Pipeline-1/terraform
+[Pipeline] {
+[Pipeline] sh
++ terraform plan -no-color -out=tfplan
+azurerm_resource_group.rg: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg]
+azurerm_public_ip.public_ip: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/publicIPAddresses/webserver-public-ip]
+azurerm_virtual_network.vnet: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/virtualNetworks/webserver-vnet]
+azurerm_network_security_group.nsg: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/networkSecurityGroups/webserver-nsg]
+azurerm_subnet.subnet: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/virtualNetworks/webserver-vnet/subnets/webserver-subnet]
+azurerm_network_interface.nic: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Network/networkInterfaces/webserver-nic]
+azurerm_linux_virtual_machine.vm: Refreshing state... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Compute/virtualMachines/webserver-vm]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # azurerm_linux_virtual_machine.vm will be updated in-place
+  ~ resource "azurerm_linux_virtual_machine" "vm" {
+        id                                                     = "/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Compute/virtualMachines/webserver-vm"
+        name                                                   = "webserver-vm"
+        tags                                                   = {}
+        # (25 unchanged attributes hidden)
+
+        # (3 unchanged blocks hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Terraform Apply)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/DevOps-Pipeline-1/terraform
+[Pipeline] {
+[Pipeline] sh
++ terraform apply -no-color -auto-approve tfplan
+azurerm_linux_virtual_machine.vm: Modifying... [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Compute/virtualMachines/webserver-vm]
+azurerm_linux_virtual_machine.vm: Modifications complete after 0s [id=/subscriptions/****/resourceGroups/jenkins-pipeline-rg/providers/Microsoft.Compute/virtualMachines/webserver-vm]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+public_ip_address = "172.191.11.131"
+resource_group_name = "jenkins-pipeline-rg"
+vm_name = "webserver-vm"
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Wait for VM)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+Waiting for public IP assignment...
+[Pipeline] sleep
+Sleeping for 30 sec
+[Pipeline] sh
++ cd terraform
++ terraform output -raw public_ip_address
+[Pipeline] echo
+Public IP found: 172.191.11.131
+[Pipeline] echo
+Waiting for SSH to be ready...
+[Pipeline] sleep
+Sleeping for 30 sec
+[Pipeline] sh
++ chmod 600 jenkins_ssh_key
+[Pipeline] sh
++ ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i jenkins_ssh_key adminuser@172.191.11.131 echo SSH connection test
+SSH connection test
+[Pipeline] echo
+SSH is ready!
+[Pipeline] sleep
+Sleeping for 1 min 0 sec
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run Ansible)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ cd terraform
++ terraform output -raw public_ip_address
+[Pipeline] writeFile
+[Pipeline] sh
++ echo === Debug Information ===
+=== Debug Information ===
++ echo Current directory:
+Current directory:
++ pwd
+/var/jenkins_home/workspace/DevOps-Pipeline-1
++ echo Inventory file contents:
+Inventory file contents:
++ cat inventory.ini
+[webserver]
+172.191.11.131 ansible_ssh_user=adminuser ansible_ssh_private_key_file=/var/jenkins_home/workspace/DevOps-Pipeline-1/jenkins_ssh_key ansible_host_key_checking=False+ echo SSH key permissions:
+SSH key permissions:
++ ls -l jenkins_ssh_key
+-rw------- 1 jenkins jenkins 3369 Jun 24 13:57 jenkins_ssh_key
+[Pipeline] sh
++ ansible-playbook -i inventory.ini -v ansible/install_web.yml
+No config file found; using defaults
+
+PLAY [Install and configure web server] ****************************************
+
+TASK [Gathering Facts] *********************************************************
+[WARNING]: Platform linux on host 172.191.11.131 is using the discovered Python
+interpreter at /usr/bin/python3.8, but future installation of another Python
+interpreter could change the meaning of that path. See
+https://docs.ansible.com/ansible-
+core/2.18/reference_appendices/interpreter_discovery.html for more information.
+ok: [172.191.11.131]
+
+TASK [Update apt cache] ********************************************************
+ok: [172.191.11.131] => {"cache_update_time": 1750771181, "cache_updated": false, "changed": false}
+
+TASK [Install Apache] **********************************************************
+ok: [172.191.11.131] => {"cache_update_time": 1750771181, "cache_updated": false, "changed": false}
+
+TASK [Ensure Apache is running] ************************************************
+ok: [172.191.11.131] => {"changed": false, "enabled": true, "name": "apache2", "state": "started", "status": {"ActiveEnterTimestamp": "Tue 2025-06-24 13:20:39 UTC", "ActiveEnterTimestampMonotonic": "727089508222", "ActiveExitTimestamp": "Tue 2025-06-24 13:20:38 UTC", "ActiveExitTimestampMonotonic": "727089387427", "ActiveState": "active", "After": "basic.target system.slice -.mount nss-lookup.target systemd-journald.socket remote-fs.target sysinit.target network.target systemd-tmpfiles-setup.service", "AllowIsolate": "no", "AllowedCPUs": "", "AllowedMemoryNodes": "", "AmbientCapabilities": "", "AssertResult": "yes", "AssertTimestamp": "Tue 2025-06-24 13:20:39 UTC", "AssertTimestampMonotonic": "727089475062", "Before": "multi-user.target shutdown.target", "BlockIOAccounting": "no", "BlockIOWeight": "[not set]", "CPUAccounting": "no", "CPUAffinity": "", "CPUAffinityFromNUMA": "no", "CPUQuotaPerSecUSec": "infinity", "CPUQuotaPeriodUSec": "infinity", "CPUSchedulingPolicy": "0", "CPUSchedulingPriority": "0", "CPUSchedulingResetOnFork": "no", "CPUShares": "[not set]", "CPUUsageNSec": "[not set]", "CPUWeight": "[not set]", "CacheDirectoryMode": "0755", "CanIsolate": "no", "CanReload": "yes", "CanStart": "yes", "CanStop": "yes", "CapabilityBoundingSet": "cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read 0x26 0x27 0x28", "CleanResult": "success", "CollectMode": "inactive", "ConditionResult": "yes", "ConditionTimestamp": "Tue 2025-06-24 13:20:39 UTC", "ConditionTimestampMonotonic": "727089475062", "ConfigurationDirectoryMode": "0755", "Conflicts": "shutdown.target", "ControlGroup": "/system.slice/apache2.service", "ControlPID": "0", "DefaultDependencies": "yes", "DefaultMemoryLow": "0", "DefaultMemoryMin": "0", "Delegate": "no", "Description": "The Apache HTTP Server", "DevicePolicy": "auto", "Documentation": "https://httpd.apache.org/docs/2.4/", "DynamicUser": "no", "EffectiveCPUs": "", "EffectiveMemoryNodes": "", "Environment": "APACHE_STARTED_BY_SYSTEMD=true", "ExecMainCode": "0", "ExecMainExitTimestampMonotonic": "0", "ExecMainPID": "62030", "ExecMainStartTimestamp": "Tue 2025-06-24 13:20:39 UTC", "ExecMainStartTimestampMonotonic": "727089508203", "ExecMainStatus": "0", "ExecReload": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl graceful ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecReloadEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl graceful ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStart": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; ignore_errors=no ; start_time=[Tue 2025-06-24 13:20:39 UTC] ; stop_time=[Tue 2025-06-24 13:20:39 UTC] ; pid=62026 ; code=exited ; status=0 }", "ExecStartEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; flags= ; start_time=[Tue 2025-06-24 13:20:39 UTC] ; stop_time=[Tue 2025-06-24 13:20:39 UTC] ; pid=62026 ; code=exited ; status=0 }", "ExecStop": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl stop ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStopEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl stop ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "FailureAction": "none", "FileDescriptorStoreMax": "0", "FinalKillSignal": "9", "FragmentPath": "/lib/systemd/system/apache2.service", "GID": "[not set]", "GuessMainPID": "yes", "IOAccounting": "no", "IOReadBytes": "18446744073709551615", "IOReadOperations": "18446744073709551615", "IOSchedulingClass": "0", "IOSchedulingPriority": "0", "IOWeight": "[not set]", "IOWriteBytes": "18446744073709551615", "IOWriteOperations": "18446744073709551615", "IPAccounting": "no", "IPEgressBytes": "[no data]", "IPEgressPackets": "[no data]", "IPIngressBytes": "[no data]", "IPIngressPackets": "[no data]", "Id": "apache2.service", "IgnoreOnIsolate": "no", "IgnoreSIGPIPE": "yes", "InactiveEnterTimestamp": "Tue 2025-06-24 13:20:39 UTC", "InactiveEnterTimestampMonotonic": "727089474203", "InactiveExitTimestamp": "Tue 2025-06-24 13:20:39 UTC", "InactiveExitTimestampMonotonic": "727089476918", "InvocationID": "b4aca48778f4450093542d4b20030101", "JobRunningTimeoutUSec": "infinity", "JobTimeoutAction": "none", "JobTimeoutUSec": "infinity", "KeyringMode": "private", "KillMode": "control-group", "KillSignal": "15", "LimitAS": "infinity", "LimitASSoft": "infinity", "LimitCORE": "infinity", "LimitCORESoft": "0", "LimitCPU": "infinity", "LimitCPUSoft": "infinity", "LimitDATA": "infinity", "LimitDATASoft": "infinity", "LimitFSIZE": "infinity", "LimitFSIZESoft": "infinity", "LimitLOCKS": "infinity", "LimitLOCKSSoft": "infinity", "LimitMEMLOCK": "65536", "LimitMEMLOCKSoft": "65536", "LimitMSGQUEUE": "819200", "LimitMSGQUEUESoft": "819200", "LimitNICE": "0", "LimitNICESoft": "0", "LimitNOFILE": "524288", "LimitNOFILESoft": "1024", "LimitNPROC": "3544", "LimitNPROCSoft": "3544", "LimitRSS": "infinity", "LimitRSSSoft": "infinity", "LimitRTPRIO": "0", "LimitRTPRIOSoft": "0", "LimitRTTIME": "infinity", "LimitRTTIMESoft": "infinity", "LimitSIGPENDING": "3544", "LimitSIGPENDINGSoft": "3544", "LimitSTACK": "infinity", "LimitSTACKSoft": "8388608", "LoadState": "loaded", "LockPersonality": "no", "LogLevelMax": "-1", "LogRateLimitBurst": "0", "LogRateLimitIntervalUSec": "0", "LogsDirectoryMode": "0755", "MainPID": "62030", "MemoryAccounting": "yes", "MemoryCurrent": "10698752", "MemoryDenyWriteExecute": "no", "MemoryHigh": "infinity", "MemoryLimit": "infinity", "MemoryLow": "0", "MemoryMax": "infinity", "MemoryMin": "0", "MemorySwapMax": "infinity", "MountAPIVFS": "no", "MountFlags": "", "NFileDescriptorStore": "0", "NRestarts": "0", "NUMAMask": "", "NUMAPolicy": "n/a", "Names": "apache2.service", "NeedDaemonReload": "no", "Nice": "0", "NoNewPrivileges": "no", "NonBlocking": "no", "NotifyAccess": "none", "OOMPolicy": "stop", "OOMScoreAdjust": "0", "OnFailureJobMode": "replace", "Perpetual": "no", "PrivateDevices": "no", "PrivateMounts": "no", "PrivateNetwork": "no", "PrivateTmp": "yes", "PrivateUsers": "no", "ProtectControlGroups": "no", "ProtectHome": "no", "ProtectHostname": "no", "ProtectKernelLogs": "no", "ProtectKernelModules": "no", "ProtectKernelTunables": "no", "ProtectSystem": "no", "RefuseManualStart": "no", "RefuseManualStop": "no", "ReloadResult": "success", "RemainAfterExit": "no", "RemoveIPC": "no", "Requires": "system.slice -.mount sysinit.target", "RequiresMountsFor": "/tmp /var/tmp", "Restart": "on-abort", "RestartKillSignal": "15", "RestartUSec": "100ms", "RestrictNamespaces": "no", "RestrictRealtime": "no", "RestrictSUIDSGID": "no", "Result": "success", "RootDirectoryStartOnly": "no", "RuntimeDirectoryMode": "0755", "RuntimeDirectoryPreserve": "no", "RuntimeMaxUSec": "infinity", "SameProcessGroup": "no", "SecureBits": "0", "SendSIGHUP": "no", "SendSIGKILL": "yes", "Slice": "system.slice", "StandardError": "inherit", "StandardInput": "null", "StandardInputData": "", "StandardOutput": "journal", "StartLimitAction": "none", "StartLimitBurst": "5", "StartLimitIntervalUSec": "10s", "StartupBlockIOWeight": "[not set]", "StartupCPUShares": "[not set]", "StartupCPUWeight": "[not set]", "StartupIOWeight": "[not set]", "StateChangeTimestamp": "Tue 2025-06-24 13:20:39 UTC", "StateChangeTimestampMonotonic": "727089508222", "StateDirectoryMode": "0755", "StatusErrno": "0", "StopWhenUnneeded": "no", "SubState": "running", "SuccessAction": "none", "SyslogFacility": "3", "SyslogLevel": "6", "SyslogLevelPrefix": "yes", "SyslogPriority": "30", "SystemCallErrorNumber": "0", "TTYReset": "no", "TTYVHangup": "no", "TTYVTDisallocate": "no", "TasksAccounting": "yes", "TasksCurrent": "55", "TasksMax": "1063", "TimeoutAbortUSec": "1min 30s", "TimeoutCleanUSec": "infinity", "TimeoutStartUSec": "1min 30s", "TimeoutStopUSec": "1min 30s", "TimerSlackNSec": "50000", "Transient": "no", "Type": "forking", "UID": "[not set]", "UMask": "0022", "UnitFilePreset": "enabled", "UnitFileState": "enabled", "UtmpMode": "init", "WantedBy": "multi-user.target", "WatchdogSignal": "6", "WatchdogTimestampMonotonic": "0", "WatchdogUSec": "0"}}
+
+TASK [Remove default Apache page] **********************************************
+changed: [172.191.11.131] => {"changed": true, "path": "/var/www/html/index.html", "state": "absent"}
+
+TASK [Copy custom website files] ***********************************************
+changed: [172.191.11.131] => {"changed": true, "checksum": "4a2ea1af9c84475c76e2973556fcde867470ae09", "dest": "/var/www/html/index.html", "gid": 33, "group": "www-data", "md5sum": "6c167f6f972ca5d7fbc6bbcec507a567", "mode": "0644", "owner": "www-data", "size": 8079, "src": "/home/adminuser/.ansible/tmp/ansible-tmp-1750773653.9904633-3194-176960530496758/.source.html", "state": "file", "uid": 33}
+
+TASK [Ensure correct permissions on /var/www/html] *****************************
+changed: [172.191.11.131] => {"changed": true, "gid": 33, "group": "www-data", "mode": "0755", "owner": "www-data", "path": "/var/www/html", "size": 4096, "state": "directory", "uid": 33}
+
+TASK [Restart Apache] **********************************************************
+changed: [172.191.11.131] => {"changed": true, "name": "apache2", "state": "started", "status": {"ActiveEnterTimestamp": "Tue 2025-06-24 13:20:39 UTC", "ActiveEnterTimestampMonotonic": "727089508222", "ActiveExitTimestamp": "Tue 2025-06-24 13:20:38 UTC", "ActiveExitTimestampMonotonic": "727089387427", "ActiveState": "active", "After": "basic.target system.slice -.mount nss-lookup.target systemd-journald.socket remote-fs.target sysinit.target network.target systemd-tmpfiles-setup.service", "AllowIsolate": "no", "AllowedCPUs": "", "AllowedMemoryNodes": "", "AmbientCapabilities": "", "AssertResult": "yes", "AssertTimestamp": "Tue 2025-06-24 13:20:39 UTC", "AssertTimestampMonotonic": "727089475062", "Before": "multi-user.target shutdown.target", "BlockIOAccounting": "no", "BlockIOWeight": "[not set]", "CPUAccounting": "no", "CPUAffinity": "", "CPUAffinityFromNUMA": "no", "CPUQuotaPerSecUSec": "infinity", "CPUQuotaPeriodUSec": "infinity", "CPUSchedulingPolicy": "0", "CPUSchedulingPriority": "0", "CPUSchedulingResetOnFork": "no", "CPUShares": "[not set]", "CPUUsageNSec": "[not set]", "CPUWeight": "[not set]", "CacheDirectoryMode": "0755", "CanIsolate": "no", "CanReload": "yes", "CanStart": "yes", "CanStop": "yes", "CapabilityBoundingSet": "cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read 0x26 0x27 0x28", "CleanResult": "success", "CollectMode": "inactive", "ConditionResult": "yes", "ConditionTimestamp": "Tue 2025-06-24 13:20:39 UTC", "ConditionTimestampMonotonic": "727089475062", "ConfigurationDirectoryMode": "0755", "Conflicts": "shutdown.target", "ControlGroup": "/system.slice/apache2.service", "ControlPID": "0", "DefaultDependencies": "yes", "DefaultMemoryLow": "0", "DefaultMemoryMin": "0", "Delegate": "no", "Description": "The Apache HTTP Server", "DevicePolicy": "auto", "Documentation": "https://httpd.apache.org/docs/2.4/", "DynamicUser": "no", "EffectiveCPUs": "", "EffectiveMemoryNodes": "", "Environment": "APACHE_STARTED_BY_SYSTEMD=true", "ExecMainCode": "0", "ExecMainExitTimestampMonotonic": "0", "ExecMainPID": "62030", "ExecMainStartTimestamp": "Tue 2025-06-24 13:20:39 UTC", "ExecMainStartTimestampMonotonic": "727089508203", "ExecMainStatus": "0", "ExecReload": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl graceful ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecReloadEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl graceful ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStart": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; ignore_errors=no ; start_time=[Tue 2025-06-24 13:20:39 UTC] ; stop_time=[Tue 2025-06-24 13:20:39 UTC] ; pid=62026 ; code=exited ; status=0 }", "ExecStartEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; flags= ; start_time=[Tue 2025-06-24 13:20:39 UTC] ; stop_time=[Tue 2025-06-24 13:20:39 UTC] ; pid=62026 ; code=exited ; status=0 }", "ExecStop": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl stop ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "ExecStopEx": "{ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl stop ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }", "FailureAction": "none", "FileDescriptorStoreMax": "0", "FinalKillSignal": "9", "FragmentPath": "/lib/systemd/system/apache2.service", "GID": "[not set]", "GuessMainPID": "yes", "IOAccounting": "no", "IOReadBytes": "18446744073709551615", "IOReadOperations": "18446744073709551615", "IOSchedulingClass": "0", "IOSchedulingPriority": "0", "IOWeight": "[not set]", "IOWriteBytes": "18446744073709551615", "IOWriteOperations": "18446744073709551615", "IPAccounting": "no", "IPEgressBytes": "[no data]", "IPEgressPackets": "[no data]", "IPIngressBytes": "[no data]", "IPIngressPackets": "[no data]", "Id": "apache2.service", "IgnoreOnIsolate": "no", "IgnoreSIGPIPE": "yes", "InactiveEnterTimestamp": "Tue 2025-06-24 13:20:39 UTC", "InactiveEnterTimestampMonotonic": "727089474203", "InactiveExitTimestamp": "Tue 2025-06-24 13:20:39 UTC", "InactiveExitTimestampMonotonic": "727089476918", "InvocationID": "b4aca48778f4450093542d4b20030101", "JobRunningTimeoutUSec": "infinity", "JobTimeoutAction": "none", "JobTimeoutUSec": "infinity", "KeyringMode": "private", "KillMode": "control-group", "KillSignal": "15", "LimitAS": "infinity", "LimitASSoft": "infinity", "LimitCORE": "infinity", "LimitCORESoft": "0", "LimitCPU": "infinity", "LimitCPUSoft": "infinity", "LimitDATA": "infinity", "LimitDATASoft": "infinity", "LimitFSIZE": "infinity", "LimitFSIZESoft": "infinity", "LimitLOCKS": "infinity", "LimitLOCKSSoft": "infinity", "LimitMEMLOCK": "65536", "LimitMEMLOCKSoft": "65536", "LimitMSGQUEUE": "819200", "LimitMSGQUEUESoft": "819200", "LimitNICE": "0", "LimitNICESoft": "0", "LimitNOFILE": "524288", "LimitNOFILESoft": "1024", "LimitNPROC": "3544", "LimitNPROCSoft": "3544", "LimitRSS": "infinity", "LimitRSSSoft": "infinity", "LimitRTPRIO": "0", "LimitRTPRIOSoft": "0", "LimitRTTIME": "infinity", "LimitRTTIMESoft": "infinity", "LimitSIGPENDING": "3544", "LimitSIGPENDINGSoft": "3544", "LimitSTACK": "infinity", "LimitSTACKSoft": "8388608", "LoadState": "loaded", "LockPersonality": "no", "LogLevelMax": "-1", "LogRateLimitBurst": "0", "LogRateLimitIntervalUSec": "0", "LogsDirectoryMode": "0755", "MainPID": "62030", "MemoryAccounting": "yes", "MemoryCurrent": "10739712", "MemoryDenyWriteExecute": "no", "MemoryHigh": "infinity", "MemoryLimit": "infinity", "MemoryLow": "0", "MemoryMax": "infinity", "MemoryMin": "0", "MemorySwapMax": "infinity", "MountAPIVFS": "no", "MountFlags": "", "NFileDescriptorStore": "0", "NRestarts": "0", "NUMAMask": "", "NUMAPolicy": "n/a", "Names": "apache2.service", "NeedDaemonReload": "no", "Nice": "0", "NoNewPrivileges": "no", "NonBlocking": "no", "NotifyAccess": "none", "OOMPolicy": "stop", "OOMScoreAdjust": "0", "OnFailureJobMode": "replace", "Perpetual": "no", "PrivateDevices": "no", "PrivateMounts": "no", "PrivateNetwork": "no", "PrivateTmp": "yes", "PrivateUsers": "no", "ProtectControlGroups": "no", "ProtectHome": "no", "ProtectHostname": "no", "ProtectKernelLogs": "no", "ProtectKernelModules": "no", "ProtectKernelTunables": "no", "ProtectSystem": "no", "RefuseManualStart": "no", "RefuseManualStop": "no", "ReloadResult": "success", "RemainAfterExit": "no", "RemoveIPC": "no", "Requires": "system.slice -.mount sysinit.target", "RequiresMountsFor": "/tmp /var/tmp", "Restart": "on-abort", "RestartKillSignal": "15", "RestartUSec": "100ms", "RestrictNamespaces": "no", "RestrictRealtime": "no", "RestrictSUIDSGID": "no", "Result": "success", "RootDirectoryStartOnly": "no", "RuntimeDirectoryMode": "0755", "RuntimeDirectoryPreserve": "no", "RuntimeMaxUSec": "infinity", "SameProcessGroup": "no", "SecureBits": "0", "SendSIGHUP": "no", "SendSIGKILL": "yes", "Slice": "system.slice", "StandardError": "inherit", "StandardInput": "null", "StandardInputData": "", "StandardOutput": "journal", "StartLimitAction": "none", "StartLimitBurst": "5", "StartLimitIntervalUSec": "10s", "StartupBlockIOWeight": "[not set]", "StartupCPUShares": "[not set]", "StartupCPUWeight": "[not set]", "StartupIOWeight": "[not set]", "StateChangeTimestamp": "Tue 2025-06-24 13:20:39 UTC", "StateChangeTimestampMonotonic": "727089508222", "StateDirectoryMode": "0755", "StatusErrno": "0", "StopWhenUnneeded": "no", "SubState": "running", "SuccessAction": "none", "SyslogFacility": "3", "SyslogLevel": "6", "SyslogLevelPrefix": "yes", "SyslogPriority": "30", "SystemCallErrorNumber": "0", "TTYReset": "no", "TTYVHangup": "no", "TTYVTDisallocate": "no", "TasksAccounting": "yes", "TasksCurrent": "55", "TasksMax": "1063", "TimeoutAbortUSec": "1min 30s", "TimeoutCleanUSec": "infinity", "TimeoutStartUSec": "1min 30s", "TimeoutStopUSec": "1min 30s", "TimerSlackNSec": "50000", "Transient": "no", "Type": "forking", "UID": "[not set]", "UMask": "0022", "UnitFilePreset": "enabled", "UnitFileState": "enabled", "UtmpMode": "init", "WantedBy": "multi-user.target", "WatchdogSignal": "6", "WatchdogTimestampMonotonic": "0", "WatchdogUSec": "0"}}
+
+PLAY RECAP *********************************************************************
+172.191.11.131             : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Verify Deployment)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ cd terraform
++ terraform output -raw public_ip_address
+[Pipeline] sleep
+Sleeping for 30 sec
+[Pipeline] sh
++ curl -s -f http://172.191.11.131
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DevOps Pipeline Success</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --hue: 160;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body {
+      background: linear-gradient(-45deg,
+        hsl(var(--hue), 70%, 40%),
+        hsl(calc(var(--hue) + 40), 80%, 60%),
+        hsl(calc(var(--hue) + 80), 90%, 30%),
+        hsl(calc(var(--hue) + 120), 80%, 60%)
+      );
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    @keyframes gradientMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+.card {
+  width: 100%;
+  max-width: 1500px;        /* wider than before (was 900px) */
+  max-height: 90vh;         /* limits height to prevent scroll */
+  overflow-y: auto;         /* only scrolls internally if content overflows */
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;      /* optional: wider padding for wider layout */
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 1s ease;
+}
+
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .card h1 {
+      font-size: 2.2rem;
+      text-align: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .card h1 i {
+      color: #ffd700;
+      margin-right: 0.5rem;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% {transform: translateY(0);}
+      50% {transform: translateY(-5px);}
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    .section {
+      margin: 1rem 0;
+    }
+
+    .section h2 {
+      font-size: 1.3rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .student-item {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.7rem;
+      border-radius: 10px;
+    }
+
+ .student-item label {
+  font-size: 1rem;   /* or 1.1rem for even larger */
+  font-weight: 600;  /* optional: make it bolder */
+  color: #ffe97f;
+}
+
+    .student-item span {
+      font-size: 0.95rem;
+      color: white;
+    }
+
+    .list {
+      list-style: none;
+      padding-left: 0;
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .list li {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 0.6rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;    
+    }
+
+.list li i {
+  margin-right: 0.8rem; /* ⬅️ increase this value */
+  color: #00ffc3;
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+  gap: 0.8rem;    
+}
+    .tech-stack {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.8rem;
+      text-align: center;
+    }
+
+    .tech {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 0.8rem;
+      border-radius: 10px;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .tech:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .tech i {
+      font-size: 1.7rem;
+      color: #fffdaf;
+    }
+
+    .tech h3 {
+      font-size: 0.95rem;
+      margin: 0.4rem 0 0.1rem;
+    }
+
+    .tech p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .btn-group {
+      text-align: center;
+      margin-top: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+
+    .btn {
+      background-color: #ffffff22;
+      border: 1px solid #ffffff44;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn i {
+      margin-right: 0.4rem;
+    }
+
+    .btn:hover {
+      background-color: #ffffff33;
+      transform: scale(1.05);
+    }
+
+    .counter-display {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .light-mode {
+      filter: invert(1) hue-rotate(180deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1><i class="fas fa-rocket"></i> DevOps Pipeline Success</h1>
+    <p class="subtitle">Everything deployed flawlessly and automatically 🚀</p>
+
+    <div class="section">
+      <h2><i class="fas fa-id-badge"></i> Student Info</h2>
+      <div class="student-grid">
+        <div class="student-item"><label>Name: </label><span>Umer Amir</span></div>
+        <div class="student-item"><label>Reg # </label><span>2112241</span></div>
+        <div class="student-item"><label>Section: </label><span>A</span></div>
+        <div class="student-item"><label>Course: </label><span>DevOps</span></div>
+        <div class="student-item"><label>Instructor: </label><span>Tariq Khan Ghouri</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-check-circle"></i> Pipeline Stages</h2>
+      <ul class="list">
+        <li><i class="fas fa-play-circle"></i> Jenkins Triggered</li>
+        <li><i class="fas fa-server"></i> Terraform Provisioned</li>
+        <li><i class="fas fa-cloud"></i> Azure VM Created</li>
+        <li><i class="fas fa-cogs"></i> Ansible Installed Apache</li>
+        <li><i class="fas fa-code"></i> App Deployed</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-cubes"></i> Tech Stack</h2>
+      <div class="tech-stack">
+        <div class="tech"><i class="fab fa-docker"></i><h3>Docker</h3><p>Containerization</p></div>
+        <div class="tech"><i class="fas fa-tools"></i><h3>Jenkins</h3><p>CI/CD</p></div>
+        <div class="tech"><i class="fas fa-terminal"></i><h3>Terraform</h3><p>Infra Code</p></div>
+        <div class="tech"><i class="fas fa-wrench"></i><h3>Ansible</h3><p>Config Mgmt</p></div>
+        <div class="tech"><i class="fas fa-cloud"></i><h3>Azure</h3><p>Cloud</p></div>
+        <div class="tech"><i class="fab fa-git-alt"></i><h3>Git</h3><p>Versioning</p></div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i>Refresh</button>
+      <button class="btn" onclick="incrementCounter()"><i class="fas fa-plus-circle"></i>+1</button>
+      <button class="btn" onclick="changeHue()"><i class="fas fa-palette"></i>Change Hue</button>
+      <button class="btn" onclick="toggleLightMode()"><i class="fas fa-adjust"></i>Light Mode</button>
+    </div>
+    <p class="counter-display">Counter: <span id="counter">0</span></p>
+
+    <div class="footer">
+      <p>Deployed on: <span id="deploy-time"></span></p>
+      <p>Ubuntu 22.04 | Apache2</p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("deploy-time").textContent = new Date().toLocaleString();
+
+    let counter = 0;
+    function incrementCounter() {
+      counter++;
+      document.getElementById("counter").textContent = counter;
+    }
+
+    let hue = 160;
+    function changeHue() {
+      hue = (hue + 30) % 360;
+      document.documentElement.style.setProperty('--hue', hue);
+    }
+
+    function toggleLightMode() {
+      document.body.classList.toggle('light-mode');
+    }
+  </script>
+</body>
+</html>
+[Pipeline] echo
+Web server is accessible!
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] sh
++ rm -f jenkins_ssh_key jenkins_ssh_key.pub
+[Pipeline] echo
+Pipeline completed successfully!
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
